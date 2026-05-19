@@ -32,7 +32,6 @@
       </svg>
       <input id="search" type="search" placeholder="키워드 검색…" autocomplete="off" />
     </div>
-    <span class="count" id="count"></span>
   </div>
 </header>
 
@@ -91,7 +90,7 @@
   const grid   = document.getElementById('grid');
   const state  = document.getElementById('state');
   const search = document.getElementById('search');
-  const count  = document.getElementById('count');
+
 
   let GITHUB_USER = '';
   let SKILLS      = [];
@@ -245,12 +244,10 @@
 
     if (list.length === 0) {
       state.innerHTML = '검색 결과가 없어요.';
-      count.textContent = '';
       return;
     }
 
     state.innerHTML = '';
-    count.textContent = `${list.length}개`;
 
     list.forEach((skill) => {
       const card = document.createElement('div');

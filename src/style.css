@@ -98,13 +98,6 @@ header p#page-subtitle {
   border-color: #b0a898;
   box-shadow: 0 2px 12px rgba(0,0,0,.1);
 }
-.count {
-  display: block;
-  text-align: right;
-  margin-top: 10px;
-  font-size: 13px;
-  color: var(--muted);
-}
 
 /* ── GRID ── */
 .grid {
