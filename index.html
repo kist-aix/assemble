@@ -101,6 +101,26 @@
     }
   }
 
+  /* ── README에서 첫 번째 H1 텍스트 추출 ── */
+  async function fetchReadmeH1(repo) {
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${GITHUB_USER}/${repo}/readme`,
+        { headers: { Accept: 'application/vnd.github.raw' } }
+      );
+      if (!res.ok) return null;
+      const text = await res.text();
+      const match = text.match(/^#\s+(.+)$/m);
+      if (!match) return null;
+      return match[1]
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')  // [text](url) → text
+        .replace(/[*_`]/g, '')                      // 인라인 마크다운 제거
+        .trim();
+    } catch {
+      return null;
+    }
+  }
+
   async function loadSkills() {
     state.innerHTML = '<div class="spinner"></div>스킬 목록을 불러오는 중…';
 
@@ -114,11 +134,15 @@
     const results = await Promise.all(
       SKILLS.map(async (skill) => {
         const info = await fetchRepoInfo(skill.repo);
+        const desc = skill.desc
+          || info?.description
+          || await fetchReadmeH1(skill.repo)
+          || '설명이 없습니다.';
         return {
           ...skill,
           url: `https://github.com/${GITHUB_USER}/${skill.repo}`,
           stars: info?.stargazers_count ?? 0,
-          desc: skill.desc || info?.description || '설명이 없습니다.',
+          desc,
           name: info?.name ?? skill.repo,
           category: getCategory(skill.repo),
         };
