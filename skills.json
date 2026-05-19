@@ -1,13 +1,24 @@
 {
   "github_user": "kist-aix",
   "auto_discover": {
-    "topics": ["skill", "harness"]
+    "topics": [
+      "skill",
+      "harness"
+    ]
   },
   "skills": [
     {
       "repo": "hwpx",
       "emoji": "📄",
       "desc": ""
+    },
+    {
+      "repo": "im-not-ai",
+      "emoji": "✨"
+    },
+    {
+      "repo": "k-skill",
+      "emoji": "✨"
     }
   ]
 }
