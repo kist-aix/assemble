@@ -20,27 +20,21 @@
 <!-- ════════════════════════════════ -->
 
 <header>
+  <p class="dept">KIST AIX전략실</p>
   <div class="logo">
     <span><span style="color:#e44126">A</span>ssemb<span style="color:#e44126">I</span>e</span>
   </div>
-  <p class="dept">KIST AIX전략실</p>
   <p id="page-subtitle"></p>
-  <!-- <div class="how-to">
-    Claude Code에서
-    <code>/skill add &lt;복사한 URL&gt;</code>
-    을 입력하면 바로 사용 가능해요
-  </div> -->
-</header>
-
-<div class="controls">
-  <div class="search-wrap">
-    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-    </svg>
-    <input id="search" type="search" placeholder="키워드 검색…" autocomplete="off" />
+  <div class="hero-search-wrap">
+    <div class="search-wrap">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input id="search" type="search" placeholder="키워드 검색…" autocomplete="off" />
+    </div>
+    <span class="count" id="count"></span>
   </div>
-  <span class="count" id="count"></span>
-</div>
+</header>
 
 <div class="tabs">
   <button class="tab active" data-tab="all">전체</button>
@@ -53,7 +47,7 @@
 
 <footer>
   <a href="https://github.com/${GITHUB_USER}" target="_blank" rel="noopener" id="footer-link">
-    GitHub에서 더 보기
+    Github    
   </a>
   &nbsp;·&nbsp; AssembIe
 </footer>
