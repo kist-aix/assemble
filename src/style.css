@@ -143,6 +143,7 @@ header p {
   gap: 10px;
   box-shadow: var(--shadow);
   transition: border-color .15s, box-shadow .15s;
+  cursor: pointer;
 }
 .card:hover {
   border-color: #d0d0d0;
@@ -174,6 +175,11 @@ header p {
   color: var(--muted);
   line-height: 1.55;
   flex: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
 .card-actions {
   display: flex;
@@ -281,6 +287,62 @@ footer {
   color: var(--muted);
 }
 footer a { color: var(--muted); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 24px;
+}
+.modal-overlay[hidden] { display: none; }
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 8px 40px rgba(0,0,0,.15);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color .15s, background .15s;
+}
+.modal-close:hover { color: var(--text); background: var(--surface); }
+.modal-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text);
+  padding-right: 28px;
+}
+.modal-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
 
 @media (max-width: 480px) {
   header { padding: 36px 16px 32px; }

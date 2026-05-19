@@ -58,6 +58,37 @@
   &nbsp;·&nbsp; AssembIe
 </footer>
 
+<div id="modal-overlay" class="modal-overlay" hidden>
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="닫기">✕</button>
+    <div class="card-top">
+      <span class="modal-name" id="modal-name"></span>
+      <span class="card-stars">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        <span id="modal-stars-val"></span>
+      </span>
+    </div>
+    <span class="card-tag" id="modal-tag" hidden></span>
+    <div class="modal-desc" id="modal-desc"></div>
+    <div class="card-actions">
+      <button class="btn-copy" id="modal-copy-btn">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        URL 복사
+      </button>
+      <a class="btn-gh" id="modal-gh-link" href="#" target="_blank" rel="noopener">
+        <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</div>
+
 <script>
   /* ── 초기화 ── */
   document.title = PAGE_TITLE + ' — Claude Code Skills';
@@ -73,10 +104,9 @@
   let cards       = [];
   let activeTab   = 'all';
 
-  function getCategory(repo) {
-    const r = repo.toLowerCase();
-    if (r.includes('skill'))   return 'skill';
-    if (r.includes('harness')) return 'harness';
+  function getCategory(topics) {
+    if (topics.includes('skill'))   return 'skill';
+    if (topics.includes('harness')) return 'harness';
     return null;
   }
 
@@ -144,7 +174,7 @@
           stars: info?.stargazers_count ?? 0,
           desc,
           name: info?.name ?? skill.repo,
-          category: getCategory(skill.repo),
+          category: getCategory(info?.topics ?? []),
         };
       })
     );
@@ -153,6 +183,67 @@
     cards = results;
     render(cards);
   }
+
+  /* ── 복사 헬퍼 ── */
+  async function copyToClipboard(url) {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+  }
+
+  function flashCopied(btn) {
+    const orig = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = `
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+      복사 완료
+    `;
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 1800);
+  }
+
+  /* ── 모달 ── */
+  function openModal(skill) {
+    document.getElementById('modal-name').textContent      = skill.name;
+    document.getElementById('modal-stars-val').textContent = skill.stars.toLocaleString();
+    document.getElementById('modal-desc').textContent      = skill.desc;
+
+    const tagEl = document.getElementById('modal-tag');
+    if (skill.category) {
+      tagEl.textContent = skill.category.charAt(0).toUpperCase() + skill.category.slice(1);
+      tagEl.hidden = false;
+    } else {
+      tagEl.hidden = true;
+    }
+
+    const copyBtn = document.getElementById('modal-copy-btn');
+    copyBtn.onclick = async (e) => {
+      e.stopPropagation();
+      await copyToClipboard(skill.url);
+      flashCopied(copyBtn);
+    };
+    document.getElementById('modal-gh-link').href = skill.url;
+    document.getElementById('modal-overlay').removeAttribute('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').setAttribute('hidden', '');
+  }
+
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-overlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
   /* ── 카드 렌더링 ── */
   function render(list) {
@@ -184,7 +275,7 @@
         ${skill.category ? `<span class="card-tag">${skill.category.charAt(0).toUpperCase() + skill.category.slice(1)}</span>` : ''}
         <div class="card-desc">${skill.desc}</div>
         <div class="card-actions">
-          <button class="btn-copy" data-url="${skill.url}">
+          <button class="btn-copy">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
@@ -198,39 +289,19 @@
           </a>
         </div>
       `;
-      grid.appendChild(card);
-    });
 
-    /* 복사 버튼 이벤트 */
-    grid.querySelectorAll('.btn-copy').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const url = btn.dataset.url;
-        try {
-          await navigator.clipboard.writeText(url);
-        } catch {
-          /* fallback */
-          const ta = document.createElement('textarea');
-          ta.value = url;
-          ta.style.position = 'fixed';
-          ta.style.opacity = '0';
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          document.body.removeChild(ta);
-        }
-        const orig = btn.innerHTML;
-        btn.classList.add('copied');
-        btn.innerHTML = `
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path d="M20 6L9 17l-5-5"/>
-          </svg>
-          복사 완료
-        `;
-        setTimeout(() => {
-          btn.classList.remove('copied');
-          btn.innerHTML = orig;
-        }, 1800);
+      card.addEventListener('click', () => openModal(skill));
+
+      const copyBtn = card.querySelector('.btn-copy');
+      copyBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await copyToClipboard(skill.url);
+        flashCopied(copyBtn);
       });
+
+      card.querySelector('.btn-gh').addEventListener('click', (e) => e.stopPropagation());
+
+      grid.appendChild(card);
     });
   }
 
