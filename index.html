@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AssembIe — Claude Code Skills</title>
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════
+     ⚙️  설정 — skills.json 에서 관리
+     ════════════════════════════════ -->
+<script>
+  // 페이지 제목 / 설명만 여기서 관리합니다.
+  // GitHub 계정명 · 스킬 목록은 skills.json 을 수정하세요.
+  const PAGE_TITLE    = 'AssembIe';
+  const PAGE_SUBTITLE = '원하는 스킬의 URL을 복사해 Claude Code에서 사용해보세요.';
+</script>
+<!-- ════════════════════════════════ -->
+
+<header>
+  <div class="logo">
+    <span><span style="color:#e44126">A</span>ssemb<span style="color:#e44126">I</span>e</span>
+  </div>
+  <p class="dept">KIST AIX전략실</p>
+  <p id="page-subtitle"></p>
+  <!-- <div class="how-to">
+    Claude Code에서
+    <code>/skill add &lt;복사한 URL&gt;</code>
+    을 입력하면 바로 사용 가능해요
+  </div> -->
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input id="search" type="search" placeholder="키워드 검색…" autocomplete="off" />
+  </div>
+  <span class="count" id="count"></span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="all">전체</button>
+  <button class="tab" data-tab="skill">Skill</button>
+  <button class="tab" data-tab="harness">Harness</button>
+</div>
+
+<div id="grid" class="grid"></div>
+<div id="state" class="state-wrap"></div>
+
+<footer>
+  <a href="https://github.com/${GITHUB_USER}" target="_blank" rel="noopener" id="footer-link">
+    GitHub에서 더 보기
+  </a>
+  &nbsp;·&nbsp; AssembIe
+</footer>
+
+<script>
+  /* ── 초기화 ── */
+  document.title = PAGE_TITLE + ' — Claude Code Skills';
+  document.getElementById('page-subtitle').textContent = PAGE_SUBTITLE;
+
+  const grid   = document.getElementById('grid');
+  const state  = document.getElementById('state');
+  const search = document.getElementById('search');
+  const count  = document.getElementById('count');
+
+  let GITHUB_USER = '';
+  let SKILLS      = [];
+  let cards       = [];
+  let activeTab   = 'all';
+
+  function getCategory(repo) {
+    const r = repo.toLowerCase();
+    if (r.includes('skill'))   return 'skill';
+    if (r.includes('harness')) return 'harness';
+    return null;
+  }
+
+  /* ── skills.json 로드 ── */
+  async function loadConfig() {
+    const res = await fetch('./skills.json');
+    if (!res.ok) throw new Error('skills.json을 불러오지 못했습니다.');
+    const config = await res.json();
+    GITHUB_USER = config.github_user;
+    SKILLS      = config.skills ?? [];
+    document.getElementById('footer-link').href = `https://github.com/${GITHUB_USER}`;
+  }
+
+  /* ── GitHub API로 레포 정보 가져오기 ── */
+  async function fetchRepoInfo(repo) {
+    try {
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo}`);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  async function loadSkills() {
+    state.innerHTML = '<div class="spinner"></div>스킬 목록을 불러오는 중…';
+
+    try {
+      await loadConfig();
+    } catch (e) {
+      state.innerHTML = `설정을 불러오지 못했습니다. (${e.message})`;
+      return;
+    }
+
+    const results = await Promise.all(
+      SKILLS.map(async (skill) => {
+        const info = await fetchRepoInfo(skill.repo);
+        return {
+          ...skill,
+          url: `https://github.com/${GITHUB_USER}/${skill.repo}`,
+          stars: info?.stargazers_count ?? 0,
+          desc: skill.desc || info?.description || '설명이 없습니다.',
+          name: info?.name ?? skill.repo,
+          category: getCategory(skill.repo),
+        };
+      })
+    );
+
+    state.innerHTML = '';
+    cards = results;
+    render(cards);
+  }
+
+  /* ── 카드 렌더링 ── */
+  function render(list) {
+    grid.innerHTML = '';
+
+    if (list.length === 0) {
+      state.innerHTML = '검색 결과가 없어요.';
+      count.textContent = '';
+      return;
+    }
+
+    state.innerHTML = '';
+    count.textContent = `${list.length}개`;
+
+    list.forEach((skill) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.name = (skill.name + ' ' + skill.desc).toLowerCase();
+      card.innerHTML = `
+        <div class="card-top">
+          <span class="card-name">${skill.name}</span>
+          <span class="card-stars">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            ${skill.stars.toLocaleString()}
+          </span>
+        </div>
+        ${skill.category ? `<span class="card-tag">${skill.category.charAt(0).toUpperCase() + skill.category.slice(1)}</span>` : ''}
+        <div class="card-desc">${skill.desc}</div>
+        <div class="card-actions">
+          <button class="btn-copy" data-url="${skill.url}">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            URL 복사
+          </button>
+          <a class="btn-gh" href="${skill.url}" target="_blank" rel="noopener">
+            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    /* 복사 버튼 이벤트 */
+    grid.querySelectorAll('.btn-copy').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const url = btn.dataset.url;
+        try {
+          await navigator.clipboard.writeText(url);
+        } catch {
+          /* fallback */
+          const ta = document.createElement('textarea');
+          ta.value = url;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        const orig = btn.innerHTML;
+        btn.classList.add('copied');
+        btn.innerHTML = `
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+          복사 완료
+        `;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = orig;
+        }, 1800);
+      });
+    });
+  }
+
+  /* ── 필터 통합 ── */
+  function applyFilters() {
+    const q = search.value.trim().toLowerCase();
+    let filtered = cards;
+    if (activeTab !== 'all') {
+      filtered = filtered.filter(c => c.category === activeTab);
+    }
+    if (q) {
+      filtered = filtered.filter(c =>
+        (c.name + ' ' + c.desc + ' ' + c.repo).toLowerCase().includes(q)
+      );
+    }
+    render(filtered);
+  }
+
+  /* ── 검색 ── */
+  search.addEventListener('input', applyFilters);
+
+  /* ── 탭 ── */
+  document.querySelectorAll('.tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      activeTab = btn.dataset.tab;
+      applyFilters();
+    });
+  });
+
+  /* ── 실행 ── */
+  loadSkills();
+</script>
+
+</body>
+</html>

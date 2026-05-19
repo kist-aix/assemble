@@ -1,0 +1,34 @@
+name: Sync Skills from GitHub
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 매일 자정(UTC) 자동 실행
+  workflow_dispatch:        # 수동 실행 버튼
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # skills.json 커밋을 위해 필요
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run sync script
+        run: node scripts/sync-skills.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit updated skills.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add skills.json
+          git diff --staged --quiet \
+            || git commit -m "chore: sync skills from GitHub [skip ci]"
+          git push

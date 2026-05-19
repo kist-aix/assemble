@@ -1,0 +1,19 @@
+{
+  "github_user": "kist-aix",
+  "auto_discover": {
+    "topics": ["claude-code-skill"],
+    "name_contains": ["skill", "harness"]
+  },
+  "skills": [
+    {
+      "repo": "example-skill-1",
+      "emoji": "🤖",
+      "desc": "여기에 스킬 설명을 적으세요. 비워두면 GitHub 레포 설명이 자동으로 표시됩니다."
+    },
+    {
+      "repo": "example-skill-2",
+      "emoji": "✨",
+      "desc": ""
+    }
+  ]
+}
