@@ -240,6 +240,10 @@
   }
 
   function openDrawer(skill) {
+    // 활성 카드 하이라이트
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.querySelector(`.card[data-repo="${skill.repo}"]`)?.classList.add('active');
+
     document.getElementById('drawer-name').textContent = skill.name;
     document.getElementById('drawer-stars-val').textContent = skill.stars.toLocaleString();
     document.getElementById('drawer-desc').textContent = skill.desc;
@@ -262,10 +266,13 @@
     document.getElementById('drawer-gh-link').href = skill.url;
 
     const overlay = document.getElementById('drawer-overlay');
-    overlay.removeAttribute('hidden');
-    requestAnimationFrame(() => overlay.classList.add('open'));
-    document.body.style.overflow = 'hidden';
+    if (!overlay.classList.contains('open')) {
+      overlay.removeAttribute('hidden');
+      requestAnimationFrame(() => overlay.classList.add('open'));
+    }
 
+    // README 스크롤 초기화 후 로드
+    document.getElementById('drawer').scrollTop = 0;
     const readmeEl = document.getElementById('drawer-readme-content');
     readmeEl.innerHTML = '<div class="readme-loading"><div class="spinner"></div><span>README 불러오는 중…</span></div>';
 
@@ -279,18 +286,15 @@
   }
 
   function closeDrawer() {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
     const overlay = document.getElementById('drawer-overlay');
     overlay.classList.remove('open');
-    document.body.style.overflow = '';
     overlay.addEventListener('transitionend', () => {
       overlay.setAttribute('hidden', '');
     }, { once: true });
   }
 
   document.getElementById('drawer-close').addEventListener('click', closeDrawer);
-  document.getElementById('drawer-overlay').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeDrawer();
-  });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
 
   /* ── 카드 렌더링 ── */
@@ -308,6 +312,7 @@
       const card = document.createElement('div');
       card.className = 'card';
       card.dataset.name = (skill.name + ' ' + skill.desc).toLowerCase();
+      card.dataset.repo = skill.repo;
       card.innerHTML = `
         <div class="card-top">
           <span class="card-name">${skill.name}</span>

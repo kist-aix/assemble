@@ -128,6 +128,10 @@ header p#page-subtitle {
   border-color: #d0d0d0;
   box-shadow: 0 2px 8px rgba(0,0,0,.09), 0 8px 24px rgba(0,0,0,.08);
 }
+.card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(171,173,176,.25), 0 2px 8px rgba(0,0,0,.08);
+}
 .card-top {
   display: flex;
   align-items: flex-start;
@@ -304,15 +308,9 @@ footer a { color: var(--muted); }
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(0,0,0,0);
   pointer-events: none;
-  transition: background .25s;
 }
 .drawer-overlay[hidden] { display: none; }
-.drawer-overlay.open {
-  background: rgba(0,0,0,.28);
-  pointer-events: all;
-}
 .drawer {
   position: absolute;
   right: 0; top: 0;
@@ -321,7 +319,7 @@ footer a { color: var(--muted); }
   height: 100%;
   background: var(--bg);
   border-left: 1px solid var(--border);
-  box-shadow: -4px 0 32px rgba(0,0,0,.12);
+  box-shadow: -8px 0 40px rgba(0,0,0,.13);
   transform: translateX(100%);
   transition: transform .25s cubic-bezier(.4,0,.2,1);
   overflow-y: auto;
