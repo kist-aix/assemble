@@ -19,6 +19,10 @@
     {
       "repo": "k-skill",
       "emoji": "✨"
+    },
+    {
+      "repo": "scientific-agent-skills",
+      "emoji": "✨"
     }
   ]
 }
