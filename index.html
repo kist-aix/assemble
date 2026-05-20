@@ -164,15 +164,16 @@
 
     const results = await Promise.all(
       SKILLS.map(async (skill) => {
-        const info = await fetchRepoInfo(skill.repo);
+        const info   = await fetchRepoInfo(skill.repo);
+        const source = info?.fork && info.parent ? info.parent : info;
         const desc = skill.desc
-          || info?.description
+          || source?.description
           || await fetchReadmeH1(skill.repo)
           || '설명이 없습니다.';
         return {
           ...skill,
           url: `https://github.com/${GITHUB_USER}/${skill.repo}`,
-          stars: info?.stargazers_count ?? 0,
+          stars: source?.stargazers_count ?? 0,
           desc,
           name: info?.name ?? skill.repo,
           category: getCategory(info?.topics ?? []),
