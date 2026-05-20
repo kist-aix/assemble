@@ -36,10 +36,11 @@
 </header>
 
 <div class="tabs">
-  <button class="tab active" data-tab="all">전체</button>
-  <button class="tab" data-tab="skill">Skill</button>
+  <button class="tab active" data-tab="skill">Skill</button>
   <button class="tab" data-tab="harness">Harness</button>
 </div>
+
+<div id="sub-tabs" class="sub-tabs"></div>
 
 <div id="grid" class="grid"></div>
 <div id="state" class="state-wrap"></div>
@@ -94,13 +95,20 @@
 
   let GITHUB_USER = '';
   let SKILLS      = [];
-  let cards       = [];
-  let activeTab   = 'all';
+  let cards        = [];
+  let activePrimary = 'skill';
+  let activeSubTag  = 'all';
 
   function getCategory(topics) {
     if (topics.includes('skill'))   return 'skill';
     if (topics.includes('harness')) return 'harness';
     return null;
+  }
+
+  const SYSTEM_TOPICS = new Set(['skill', 'harness', 'claude', 'claude-code']);
+  function getSubTags(skillConfig, topics) {
+    if (skillConfig.tags?.length) return skillConfig.tags;
+    return topics.filter(t => !SYSTEM_TOPICS.has(t));
   }
 
   /* ── skills.json 로드 ── */
@@ -168,13 +176,15 @@
           desc,
           name: info?.name ?? skill.repo,
           category: getCategory(info?.topics ?? []),
+          subTags: getSubTags(skill, info?.topics ?? []),
         };
       })
     );
 
     state.innerHTML = '';
     cards = results;
-    render(cards);
+    renderSubTabs();
+    applyFilters();
   }
 
   /* ── 복사 헬퍼 ── */
@@ -211,11 +221,12 @@
     document.getElementById('modal-desc').textContent      = skill.desc;
 
     const tagEl = document.getElementById('modal-tag');
-    if (skill.category) {
-      tagEl.textContent = skill.category.charAt(0).toUpperCase() + skill.category.slice(1);
-      tagEl.hidden = false;
+    if (skill.subTags.length) {
+      tagEl.innerHTML = skill.subTags.map(t => `<span class="card-tag">${t}</span>`).join('');
+      tagEl.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
+      tagEl.removeAttribute('hidden');
     } else {
-      tagEl.hidden = true;
+      tagEl.setAttribute('hidden', '');
     }
 
     const copyBtn = document.getElementById('modal-copy-btn');
@@ -263,7 +274,7 @@
             ${skill.stars.toLocaleString()}
           </span>
         </div>
-        ${skill.category ? `<span class="card-tag">${skill.category.charAt(0).toUpperCase() + skill.category.slice(1)}</span>` : ''}
+        ${skill.subTags.length ? `<div class="card-tags">${skill.subTags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>` : ''}
         <div class="card-desc">${skill.desc}</div>
         <div class="card-actions">
           <button class="btn-copy">
@@ -296,12 +307,31 @@
     });
   }
 
+  /* ── 서브탭 렌더링 ── */
+  function renderSubTabs() {
+    const el = document.getElementById('sub-tabs');
+    const primaryCards = cards.filter(c => c.category === activePrimary);
+    const allTags = [...new Set(primaryCards.flatMap(c => c.subTags))].sort();
+    if (allTags.length === 0) { el.innerHTML = ''; return; }
+    el.innerHTML = ['all', ...allTags].map(tag =>
+      `<button class="sub-tab${activeSubTag === tag ? ' active' : ''}" data-sub="${tag}">${tag === 'all' ? '전체' : tag}</button>`
+    ).join('');
+    el.querySelectorAll('.sub-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        el.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        activeSubTag = btn.dataset.sub;
+        applyFilters();
+      });
+    });
+  }
+
   /* ── 필터 통합 ── */
   function applyFilters() {
     const q = search.value.trim().toLowerCase();
-    let filtered = cards;
-    if (activeTab !== 'all') {
-      filtered = filtered.filter(c => c.category === activeTab);
+    let filtered = cards.filter(c => c.category === activePrimary);
+    if (activeSubTag !== 'all') {
+      filtered = filtered.filter(c => c.subTags.includes(activeSubTag));
     }
     if (q) {
       filtered = filtered.filter(c =>
@@ -314,12 +344,14 @@
   /* ── 검색 ── */
   search.addEventListener('input', applyFilters);
 
-  /* ── 탭 ── */
+  /* ── 상위 탭 ── */
   document.querySelectorAll('.tab').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
-      activeTab = btn.dataset.tab;
+      activePrimary = btn.dataset.tab;
+      activeSubTag = 'all';
+      renderSubTabs();
       applyFilters();
     });
   });
