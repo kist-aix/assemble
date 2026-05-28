@@ -23,6 +23,14 @@
     {
       "repo": "scientific-agent-skills",
       "emoji": "✨"
+    },
+    {
+      "repo": "harness",
+      "emoji": "✨"
+    },
+    {
+      "repo": "harness-100",
+      "emoji": "✨"
     }
   ]
 }
