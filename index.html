@@ -43,55 +43,58 @@
 
 <div id="sub-tabs" class="sub-tabs"></div>
 
-<div id="grid" class="grid"></div>
-<div id="state" class="state-wrap"></div>
-
-<footer>
-  <a href="https://github.com/${GITHUB_USER}" target="_blank" rel="noopener" id="footer-link">
-    Github    
-  </a>
-  &nbsp;·&nbsp; AssembIe
-</footer>
-
-<div id="drawer-overlay" class="drawer-overlay" hidden>
-  <div id="drawer" class="drawer">
-    <div class="drawer-header">
-      <div class="drawer-title-row">
-        <span class="drawer-name" id="drawer-name"></span>
-        <div class="drawer-header-actions">
-          <span class="card-stars">
-            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+<div class="content-wrap">
+  <div class="main-col">
+    <div id="grid" class="grid"></div>
+    <div id="state" class="state-wrap"></div>
+  </div>
+  <div id="drawer-overlay" class="drawer-overlay" hidden>
+    <div id="drawer" class="drawer">
+      <div class="drawer-header">
+        <div class="drawer-title-row">
+          <span class="drawer-name" id="drawer-name"></span>
+          <div class="drawer-header-actions">
+            <span class="card-stars">
+              <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <span id="drawer-stars-val"></span>
+            </span>
+            <button class="drawer-close" id="drawer-close" aria-label="닫기">✕</button>
+          </div>
+        </div>
+        <div id="drawer-tags" class="card-tags"></div>
+        <p class="drawer-desc" id="drawer-desc"></p>
+        <div class="card-actions">
+          <button class="btn-copy" id="drawer-copy-btn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
-            <span id="drawer-stars-val"></span>
-          </span>
-          <button class="drawer-close" id="drawer-close" aria-label="닫기">✕</button>
+            URL 복사
+          </button>
+          <a class="btn-gh" id="drawer-gh-link" href="#" target="_blank" rel="noopener">
+            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            GitHub
+          </a>
         </div>
       </div>
-      <div id="drawer-tags" class="card-tags"></div>
-      <p class="drawer-desc" id="drawer-desc"></p>
-      <div class="card-actions">
-        <button class="btn-copy" id="drawer-copy-btn">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-          </svg>
-          URL 복사
-        </button>
-        <a class="btn-gh" id="drawer-gh-link" href="#" target="_blank" rel="noopener">
-          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
-          </svg>
-          GitHub
-        </a>
+      <div class="drawer-divider"></div>
+      <div class="drawer-readme-wrap">
+        <div class="drawer-readme-label">README</div>
+        <div id="drawer-readme-content" class="readme-content"></div>
       </div>
-    </div>
-    <div class="drawer-divider"></div>
-    <div class="drawer-readme-wrap">
-      <div class="drawer-readme-label">README</div>
-      <div id="drawer-readme-content" class="readme-content"></div>
     </div>
   </div>
 </div>
+
+<footer>
+  <a href="https://github.com/${GITHUB_USER}" target="_blank" rel="noopener" id="footer-link">
+    Github
+  </a>
+  &nbsp;·&nbsp; AssembIe
+</footer>
 
 <script>
   /* ── 초기화 ── */
@@ -289,9 +292,13 @@
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
     const overlay = document.getElementById('drawer-overlay');
     overlay.classList.remove('open');
-    overlay.addEventListener('transitionend', () => {
+    if (window.innerWidth <= 900) {
+      overlay.addEventListener('transitionend', () => {
+        overlay.setAttribute('hidden', '');
+      }, { once: true });
+    } else {
       overlay.setAttribute('hidden', '');
-    }, { once: true });
+    }
   }
 
   document.getElementById('drawer-close').addEventListener('click', closeDrawer);
