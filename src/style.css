@@ -341,6 +341,7 @@ footer a { color: var(--muted); }
   line-height: 1.7;
 }
 #detail-body[hidden] { display: none; }
+#detail-empty[hidden] { display: none; }
 
 @media (max-width: 900px) {
   .content-wrap { display: block; padding: 0; }
