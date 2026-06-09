@@ -133,34 +133,67 @@
     document.getElementById('footer-link').href = `https://github.com/${GITHUB_USER}`;
   }
 
+  const CACHE_TTL = 60 * 60 * 1000; // 1시간
+
+  function cacheGet(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const { ts, data } = JSON.parse(raw);
+      if (Date.now() - ts < CACHE_TTL) return data;
+      return null;
+    } catch { return null; }
+  }
+
+  function cacheSet(key, data) {
+    try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch {}
+  }
+
+  function cacheGetStale(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw).data : null;
+    } catch { return null; }
+  }
+
   /* ── GitHub API로 레포 정보 가져오기 ── */
   async function fetchRepoInfo(repo) {
+    const key = `repo_${GITHUB_USER}_${repo}`;
+    const cached = cacheGet(key);
+    if (cached) return cached;
     try {
       const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo}`);
-      if (!res.ok) return null;
-      return await res.json();
+      if (!res.ok) return res.status === 403 ? cacheGetStale(key) : null;
+      const data = await res.json();
+      cacheSet(key, data);
+      return data;
     } catch {
-      return null;
+      return cacheGetStale(key);
     }
   }
 
   /* ── README에서 첫 번째 H1 텍스트 추출 ── */
   async function fetchReadmeH1(repo) {
+    const key = `h1_${GITHUB_USER}_${repo}`;
+    const cached = cacheGet(key);
+    if (cached) return cached;
     try {
       const res = await fetch(
         `https://api.github.com/repos/${GITHUB_USER}/${repo}/readme`,
         { headers: { Accept: 'application/vnd.github.raw' } }
       );
-      if (!res.ok) return null;
+      if (!res.ok) return res.status === 403 ? cacheGetStale(key) : null;
       const text = await res.text();
       const match = text.match(/^#\s+(.+)$/m);
       if (!match) return null;
-      return match[1]
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')  // [text](url) → text
-        .replace(/[*_`]/g, '')                      // 인라인 마크다운 제거
+      const h1 = match[1]
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/[*_`]/g, '')
         .trim();
+      cacheSet(key, h1);
+      return h1;
     } catch {
-      return null;
+      return cacheGetStale(key);
     }
   }
 
@@ -348,7 +381,11 @@
   function renderSubTabs() {
     const el = document.getElementById('sub-tabs');
     const primaryCards = cards.filter(c => c.category === activePrimary);
-    const allTags = [...new Set(primaryCards.flatMap(c => c.subTags))].sort();
+    const allTags = [...new Set(primaryCards.flatMap(c => c.subTags))].sort((a, b) => {
+      if (a.startsWith('기타') && !b.startsWith('기타')) return 1;
+      if (!a.startsWith('기타') && b.startsWith('기타')) return -1;
+      return a.localeCompare(b, 'ko');
+    });
     if (allTags.length === 0) { el.innerHTML = ''; return; }
     el.innerHTML = ['all', ...allTags].map(tag =>
       `<button class="sub-tab${activeSubTag === tag ? ' active' : ''}" data-sub="${tag}">${tag === 'all' ? '전체' : tag}</button>`
