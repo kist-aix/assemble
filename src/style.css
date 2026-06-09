@@ -197,6 +197,7 @@ header p#page-subtitle {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  white-space: nowrap;
 }
 .btn-copy:hover { background: #8e9094; }
 .btn-copy:active { transform: scale(.97); }
@@ -318,10 +319,9 @@ footer a { color: var(--muted); }
 .detail-panel {
   width: 360px;
   flex-shrink: 0;
-  align-self: flex-start;
+  align-self: stretch;
   position: sticky;
   top: 24px;
-  max-height: calc(100vh - 48px);
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
