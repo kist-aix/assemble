@@ -10,7 +10,8 @@
     {
       "repo": "hwpx",
       "emoji": "📄",
-      "desc": ""
+      "desc": "",
+      "tags": ["문서"]
     },
     {
       "repo": "im-not-ai",
@@ -18,11 +19,13 @@
     },
     {
       "repo": "k-skill",
-      "emoji": "✨"
+      "emoji": "✨",
+      "tags": ["기타(k-skill)"]
     },
     {
       "repo": "scientific-agent-skills",
-      "emoji": "✨"
+      "emoji": "✨",
+      "tags": ["연구"]
     },
     {
       "repo": "harness",
@@ -34,27 +37,33 @@
     },
     {
       "repo": "academic-research-skills",
-      "emoji": "✨"
+      "emoji": "✨",
+      "tags": ["연구"]
     },
     {
       "repo": "science-skills",
-      "emoji": "✨"
+      "emoji": "✨",
+      "tags": ["연구"]
     },
     {
       "repo": "paper-curation",
-      "emoji": "✨"
+      "emoji": "✨",
+      "tags": ["연구"]
     },
     {
       "repo": "searchinfohwpx",
-      "emoji": "✨"
+      "emoji": "✨",
+      "tags": ["문서"]
     },
     {
       "repo": "scholar-megasearch",
-      "emoji": "✨"
+      "emoji": "✨",
+      "tags": ["연구"]
     },
     {
       "repo": "autoresearch",
-      "emoji": "✨"
+      "emoji": "✨",
+      "tags": ["연구"]
     }
   ]
 }
