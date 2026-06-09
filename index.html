@@ -48,31 +48,31 @@
     <div id="grid" class="grid"></div>
     <div id="state" class="state-wrap"></div>
   </div>
-  <div id="drawer-overlay" class="drawer-overlay" hidden>
-    <div id="drawer" class="drawer">
+  <aside class="detail-panel" id="detail-panel">
+    <div class="detail-empty" id="detail-empty">
+      <p id="detail-hint">궁금한 스킬을 눌러보세요.</p>
+    </div>
+    <div id="detail-body" hidden>
       <div class="drawer-header">
         <div class="drawer-title-row">
-          <span class="drawer-name" id="drawer-name"></span>
-          <div class="drawer-header-actions">
-            <span class="card-stars">
-              <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-              <span id="drawer-stars-val"></span>
-            </span>
-            <button class="drawer-close" id="drawer-close" aria-label="닫기">✕</button>
-          </div>
+          <span class="drawer-name" id="detail-name"></span>
+          <span class="card-stars">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span id="detail-stars"></span>
+          </span>
         </div>
-        <div id="drawer-tags" class="card-tags"></div>
-        <p class="drawer-desc" id="drawer-desc"></p>
+        <div id="detail-tags" class="card-tags"></div>
+        <p class="drawer-desc" id="detail-desc"></p>
         <div class="card-actions">
-          <button class="btn-copy" id="drawer-copy-btn">
+          <button class="btn-copy" id="detail-copy-btn">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
             URL 복사
           </button>
-          <a class="btn-gh" id="drawer-gh-link" href="#" target="_blank" rel="noopener">
+          <a class="btn-gh" id="detail-gh-link" href="#" target="_blank" rel="noopener">
             <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
             </svg>
@@ -80,13 +80,12 @@
           </a>
         </div>
       </div>
-      <div class="drawer-divider"></div>
       <div class="drawer-readme-wrap">
         <div class="drawer-readme-label">README</div>
-        <div id="drawer-readme-content" class="readme-content"></div>
+        <div id="detail-readme" class="readme-content"></div>
       </div>
     </div>
-  </div>
+  </aside>
 </div>
 
 <footer>
@@ -242,16 +241,15 @@
     }
   }
 
-  function openDrawer(skill) {
-    // 활성 카드 하이라이트
+  function updateDetail(skill) {
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
     document.querySelector(`.card[data-repo="${skill.repo}"]`)?.classList.add('active');
 
-    document.getElementById('drawer-name').textContent = skill.name;
-    document.getElementById('drawer-stars-val').textContent = skill.stars.toLocaleString();
-    document.getElementById('drawer-desc').textContent = skill.desc;
+    document.getElementById('detail-name').textContent = skill.name;
+    document.getElementById('detail-stars').textContent = skill.stars.toLocaleString();
+    document.getElementById('detail-desc').textContent = skill.desc;
 
-    const tagsEl = document.getElementById('drawer-tags');
+    const tagsEl = document.getElementById('detail-tags');
     if (skill.subTags.length) {
       tagsEl.innerHTML = skill.subTags.map(t => `<span class="card-tag">${t}</span>`).join('');
       tagsEl.style.display = 'flex';
@@ -260,49 +258,32 @@
       tagsEl.style.display = 'none';
     }
 
-    const copyBtn = document.getElementById('drawer-copy-btn');
-    copyBtn.onclick = async (e) => {
-      e.stopPropagation();
+    const copyBtn = document.getElementById('detail-copy-btn');
+    copyBtn.onclick = async () => {
       await copyToClipboard(skill.url);
       flashCopied(copyBtn);
     };
-    document.getElementById('drawer-gh-link').href = skill.url;
+    document.getElementById('detail-gh-link').href = skill.url;
 
-    const overlay = document.getElementById('drawer-overlay');
-    if (!overlay.classList.contains('open')) {
-      overlay.removeAttribute('hidden');
-      requestAnimationFrame(() => overlay.classList.add('open'));
-    }
+    document.getElementById('detail-empty').hidden = true;
+    document.getElementById('detail-body').hidden = false;
 
-    // README 스크롤 초기화 후 로드
-    document.getElementById('drawer').scrollTop = 0;
-    const readmeEl = document.getElementById('drawer-readme-content');
+    document.getElementById('detail-panel').scrollTop = 0;
+    const readmeEl = document.getElementById('detail-readme');
     readmeEl.innerHTML = '<div class="readme-loading"><div class="spinner"></div><span>README 불러오는 중…</span></div>';
 
     fetchReadme(skill.repo).then(text => {
-      if (text) {
-        readmeEl.innerHTML = marked.parse(text);
-      } else {
-        readmeEl.innerHTML = '<p class="readme-empty">README를 불러올 수 없습니다.</p>';
-      }
+      readmeEl.innerHTML = text ? marked.parse(text) : '<p class="readme-empty">README를 불러올 수 없습니다.</p>';
     });
   }
 
-  function closeDrawer() {
+  function resetDetail() {
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-    const overlay = document.getElementById('drawer-overlay');
-    overlay.classList.remove('open');
-    if (window.innerWidth <= 900) {
-      overlay.addEventListener('transitionend', () => {
-        overlay.setAttribute('hidden', '');
-      }, { once: true });
-    } else {
-      overlay.setAttribute('hidden', '');
-    }
+    document.getElementById('detail-empty').hidden = false;
+    document.getElementById('detail-body').hidden = true;
+    document.getElementById('detail-hint').textContent =
+      activePrimary === 'harness' ? '궁금한 하네스를 눌러보세요.' : '궁금한 스킬을 눌러보세요.';
   }
-
-  document.getElementById('drawer-close').addEventListener('click', closeDrawer);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
 
   /* ── 카드 렌더링 ── */
   function render(list) {
@@ -348,7 +329,7 @@
         </div>
       `;
 
-      card.addEventListener('click', () => openDrawer(skill));
+      card.addEventListener('click', () => updateDetail(skill));
 
       const copyBtn = card.querySelector('.btn-copy');
       copyBtn.addEventListener('click', async (e) => {
@@ -409,6 +390,7 @@
       activeSubTag = 'all';
       renderSubTabs();
       applyFilters();
+      resetDetail();
     });
   });
 
