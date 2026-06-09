@@ -23,6 +23,34 @@
     {
       "repo": "scientific-agent-skills",
       "emoji": "✨"
+    },
+    {
+      "repo": "harness",
+      "emoji": "✨"
+    },
+    {
+      "repo": "harness-100",
+      "emoji": "✨"
+    },
+    {
+      "repo": "academic-research-skills",
+      "emoji": "✨"
+    },
+    {
+      "repo": "science-skills",
+      "emoji": "✨"
+    },
+    {
+      "repo": "paper-curation",
+      "emoji": "✨"
+    },
+    {
+      "repo": "searchinfohwpx",
+      "emoji": "✨"
+    },
+    {
+      "repo": "scholar-megasearch",
+      "emoji": "✨"
     }
   ]
 }
