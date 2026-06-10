@@ -301,7 +301,7 @@
     document.getElementById('detail-empty').hidden = true;
     document.getElementById('detail-body').hidden = false;
 
-    document.getElementById('detail-panel').scrollTop = 0;
+    document.getElementById('detail-body').scrollTop = 0;
     const readmeEl = document.getElementById('detail-readme');
     readmeEl.innerHTML = '<div class="readme-loading"><div class="spinner"></div><span>README 불러오는 중…</span></div>';
 
@@ -375,6 +375,16 @@
 
       grid.appendChild(card);
     });
+
+    requestAnimationFrame(syncPanelHeight);
+  }
+
+  function syncPanelHeight() {
+    const panel = document.getElementById('detail-panel');
+    const mainCol = document.querySelector('.main-col');
+    if (!mainCol) return;
+    const pb = parseInt(getComputedStyle(mainCol).paddingBottom) || 0;
+    panel.style.height = (mainCol.offsetHeight - pb) + 'px';
   }
 
   /* ── 서브탭 렌더링 ── */
@@ -430,6 +440,8 @@
       resetDetail();
     });
   });
+
+  window.addEventListener('resize', syncPanelHeight);
 
   /* ── 실행 ── */
   loadSkills();

@@ -322,8 +322,8 @@ footer a { color: var(--muted); }
   align-self: flex-start;
   position: sticky;
   top: 24px;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
@@ -331,15 +331,22 @@ footer a { color: var(--muted); }
   margin-top: 24px;
 }
 .detail-empty {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 220px;
   padding: 48px 24px;
   text-align: center;
   color: var(--muted);
   font-size: 14px;
   line-height: 1.7;
+}
+#detail-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 #detail-body[hidden] { display: none; }
 #detail-empty[hidden] { display: none; }
@@ -402,7 +409,6 @@ footer a { color: var(--muted); }
 }
 .drawer-readme-wrap {
   padding: 16px 16px 32px;
-  flex: 1;
 }
 .drawer-readme-label {
   font-size: 11px;
