@@ -1,0 +1,155 @@
+{
+  "github_user": "kist-aix",
+  "skills": [
+    {
+      "repo": "hwpx",
+      "emoji": "📄",
+      "name": "hwpx",
+      "desc": "공공기관 양식의 한글(.hwpx) 보고서를 자동 생성하는 Claude Code 스킬",
+      "stars": 9,
+      "category": "skill",
+      "subTags": [
+        "문서"
+      ],
+      "url": "https://github.com/kist-aix/hwpx",
+      "hasReadme": true
+    },
+    {
+      "repo": "im-not-ai",
+      "emoji": "✨",
+      "name": "im-not-ai",
+      "desc": "AI가 쓴 글이 아닌 것처럼 윤문해주는 스킬",
+      "stars": 3570,
+      "category": "skill",
+      "subTags": [],
+      "url": "https://github.com/kist-aix/im-not-ai",
+      "hasReadme": true
+    },
+    {
+      "repo": "k-skill",
+      "emoji": "✨",
+      "name": "k-skill",
+      "desc": "한국인을 위한 스킬 모음집 - SRT, KTX, 카카오톡, 한글과컴퓨터, 날씨, 미세먼지, 법령, 주식정보, 조선왕조실록, KBO, K-리그, LCK, 특허 검색, 토스 증권, 맞춤법 검사, 중고차 가격, 쿠팡, 네이버 블로그, 다이소, 올리브영, 택배 송장 조회 등등...",
+      "stars": 6067,
+      "category": "skill",
+      "subTags": [
+        "기타"
+      ],
+      "url": "https://github.com/kist-aix/k-skill",
+      "hasReadme": true
+    },
+    {
+      "repo": "scientific-agent-skills",
+      "emoji": "✨",
+      "name": "scientific-agent-skills",
+      "desc": "Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 160,000+ scientists worldwide. 140 ready-to-use skills plus 100+ scientific databases covering biology, chemistry, medicine, and drug discovery. Compatible with Cursor, Claude Code, Codex, Pi, Antigravity, and the open Agent Skills standard.",
+      "stars": 30232,
+      "category": "skill",
+      "subTags": [
+        "연구"
+      ],
+      "url": "https://github.com/kist-aix/scientific-agent-skills",
+      "hasReadme": true
+    },
+    {
+      "repo": "harness",
+      "emoji": "✨",
+      "name": "harness",
+      "desc": "A meta-skill that designs domain-specific agent teams, defines specialized agents, and generates the skills they use.",
+      "stars": 8207,
+      "category": "harness",
+      "subTags": [],
+      "url": "https://github.com/kist-aix/harness",
+      "hasReadme": true
+    },
+    {
+      "repo": "harness-100",
+      "emoji": "✨",
+      "name": "harness-100",
+      "desc": "Harness 100",
+      "stars": 1127,
+      "category": "harness",
+      "subTags": [],
+      "url": "https://github.com/kist-aix/harness-100",
+      "hasReadme": true
+    },
+    {
+      "repo": "academic-research-skills",
+      "emoji": "✨",
+      "name": "academic-research-skills",
+      "desc": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
+      "stars": 36396,
+      "category": "skill",
+      "subTags": [
+        "연구"
+      ],
+      "url": "https://github.com/kist-aix/academic-research-skills",
+      "hasReadme": true
+    },
+    {
+      "repo": "science-skills",
+      "emoji": "✨",
+      "name": "science-skills",
+      "desc": "GDM Science Skills to speed up agentic scientific workflows with better grounding and higher token efficiency. Integrate insights from AlphaGenome, AFDB, UniProt and 30+ other databases and tools.",
+      "stars": 2241,
+      "category": "skill",
+      "subTags": [
+        "연구"
+      ],
+      "url": "https://github.com/kist-aix/science-skills",
+      "hasReadme": true
+    },
+    {
+      "repo": "paper-curation",
+      "emoji": "✨",
+      "name": "paper-curation",
+      "desc": "Automated paper curation and reviews",
+      "stars": 61,
+      "category": "skill",
+      "subTags": [
+        "연구"
+      ],
+      "url": "https://github.com/kist-aix/paper-curation",
+      "hasReadme": true
+    },
+    {
+      "repo": "searchinfohwpx",
+      "emoji": "✨",
+      "name": "searchinfohwpx",
+      "desc": "Claude Code skill: automated weekly trend report in HWPX format (papers/news/patents search + dedup + Zotero + HWPX)",
+      "stars": 6,
+      "category": "skill",
+      "subTags": [
+        "문서"
+      ],
+      "url": "https://github.com/kist-aix/searchinfohwpx",
+      "hasReadme": true
+    },
+    {
+      "repo": "scholar-megasearch",
+      "emoji": "✨",
+      "name": "scholar-megasearch",
+      "desc": "Massive multi-source academic literature search for Claude Code — one skill fans out subagents across 20+ scholarly databases (arXiv, Semantic Scholar, Crossref, OpenAlex, PubMed, …), merges into a deduplicated ranked corpus, and acquires the original PDFs.",
+      "stars": 17,
+      "category": "skill",
+      "subTags": [
+        "연구"
+      ],
+      "url": "https://github.com/kist-aix/scholar-megasearch",
+      "hasReadme": true
+    },
+    {
+      "repo": "autoresearch",
+      "emoji": "✨",
+      "name": "autoresearch",
+      "desc": "Claude Autoresearch Skill — Autonomous goal-directed iteration for Claude Code. Inspired by Karpathy's autoresearch. Modify → Verify → Keep/Discard → Repeat forever.",
+      "stars": 5254,
+      "category": "skill",
+      "subTags": [
+        "연구"
+      ],
+      "url": "https://github.com/kist-aix/autoresearch",
+      "hasReadme": true
+    }
+  ]
+}

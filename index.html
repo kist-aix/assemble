@@ -106,129 +106,31 @@
 
 
   let GITHUB_USER = '';
-  let SKILLS      = [];
   let cards        = [];
   let activePrimary = 'skill';
   let activeSubTag  = 'all';
 
-  function getCategory(topics) {
-    if (topics.includes('skill'))   return 'skill';
-    if (topics.includes('harness')) return 'harness';
-    return null;
-  }
-
-  const SYSTEM_TOPICS = new Set(['skill', 'harness', 'claude', 'claude-code']);
-  function getSubTags(skillConfig, topics) {
-    if (skillConfig.tags?.length) return skillConfig.tags;
-    return topics.filter(t => !SYSTEM_TOPICS.has(t));
-  }
-
-  /* ── skills.json 로드 ── */
-  async function loadConfig() {
-    const res = await fetch('./skills.json');
-    if (!res.ok) throw new Error('skills.json을 불러오지 못했습니다.');
-    const config = await res.json();
-    GITHUB_USER = config.github_user;
-    SKILLS      = config.skills ?? [];
-    document.getElementById('footer-link').href = `https://github.com/${GITHUB_USER}`;
-  }
-
-  const CACHE_TTL = 60 * 60 * 1000; // 1시간
-
-  function cacheGet(key) {
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) return null;
-      const { ts, data } = JSON.parse(raw);
-      if (Date.now() - ts < CACHE_TTL) return data;
-      return null;
-    } catch { return null; }
-  }
-
-  function cacheSet(key, data) {
-    try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch {}
-  }
-
-  function cacheGetStale(key) {
-    try {
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw).data : null;
-    } catch { return null; }
-  }
-
-  /* ── GitHub API로 레포 정보 가져오기 ── */
-  async function fetchRepoInfo(repo) {
-    const key = `repo_${GITHUB_USER}_${repo}`;
-    const cached = cacheGet(key);
-    if (cached) return cached;
-    try {
-      const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${repo}`);
-      if (!res.ok) return res.status === 403 ? cacheGetStale(key) : null;
-      const data = await res.json();
-      cacheSet(key, data);
-      return data;
-    } catch {
-      return cacheGetStale(key);
-    }
-  }
-
-  /* ── README에서 첫 번째 H1 텍스트 추출 ── */
-  async function fetchReadmeH1(repo) {
-    const key = `h1_${GITHUB_USER}_${repo}`;
-    const cached = cacheGet(key);
-    if (cached) return cached;
-    try {
-      const res = await fetch(
-        `https://api.github.com/repos/${GITHUB_USER}/${repo}/readme`,
-        { headers: { Accept: 'application/vnd.github.raw' } }
-      );
-      if (!res.ok) return res.status === 403 ? cacheGetStale(key) : null;
-      const text = await res.text();
-      const match = text.match(/^#\s+(.+)$/m);
-      if (!match) return null;
-      const h1 = match[1]
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-        .replace(/[*_`]/g, '')
-        .trim();
-      cacheSet(key, h1);
-      return h1;
-    } catch {
-      return cacheGetStale(key);
-    }
-  }
-
+  /* ── 정적 데이터 로드 (data.json) ──
+     GitHub API를 브라우저에서 직접 호출하지 않는다 → rate limit(IP당 60회/시간) 회피.
+     data.json / readme/*.md 는 GitHub Actions가 매일 미리 구워서 커밋한다. */
   async function loadSkills() {
     state.innerHTML = '<div class="spinner"></div>스킬 목록을 불러오는 중…';
 
+    let data;
     try {
-      await loadConfig();
+      const res = await fetch('./data.json');
+      if (!res.ok) throw new Error('data.json을 불러오지 못했습니다.');
+      data = await res.json();
     } catch (e) {
-      state.innerHTML = `설정을 불러오지 못했습니다. (${e.message})`;
+      state.innerHTML = `데이터를 불러오지 못했습니다. (${e.message})`;
       return;
     }
 
-    const results = await Promise.all(
-      SKILLS.map(async (skill) => {
-        const info   = await fetchRepoInfo(skill.repo);
-        const source = info?.fork && info.parent ? info.parent : info;
-        const desc = skill.desc
-          || source?.description
-          || await fetchReadmeH1(skill.repo)
-          || '설명이 없습니다.';
-        return {
-          ...skill,
-          url: `https://github.com/${GITHUB_USER}/${skill.repo}`,
-          stars: source?.stargazers_count ?? 0,
-          desc,
-          name: info?.name ?? skill.repo,
-          category: getCategory(info?.topics ?? []),
-          subTags: getSubTags(skill, info?.topics ?? []),
-        };
-      })
-    );
+    GITHUB_USER = data.github_user;
+    document.getElementById('footer-link').href = `https://github.com/${GITHUB_USER}`;
 
     state.innerHTML = '';
-    cards = results;
+    cards = data.skills;
     renderSubTabs();
     applyFilters();
   }
@@ -263,10 +165,7 @@
   /* ── 드로어 ── */
   async function fetchReadme(repo) {
     try {
-      const res = await fetch(
-        `https://api.github.com/repos/${GITHUB_USER}/${repo}/readme`,
-        { headers: { Accept: 'application/vnd.github.raw' } }
-      );
+      const res = await fetch(`./readme/${repo}.md`);
       if (!res.ok) return null;
       return await res.text();
     } catch {

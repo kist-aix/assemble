@@ -27,11 +27,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit updated skills.json
+      # fork를 upstream과 먼저 싱크한 뒤 데이터를 구워야 페이지가 최신 내용을 반영.
+      # FORK_SYNC_TOKEN 미설정 시 이 단계는 아무것도 바꾸지 않고 넘어감(파이프라인은 계속 진행).
+      - name: Sync forks with upstream
+        run: node scripts/sync-forks.js
+        env:
+          FORK_SYNC_TOKEN: ${{ secrets.FORK_SYNC_TOKEN }}
+
+      - name: Build static data (data.json + readme/)
+        run: node scripts/build-data.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit updated data
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add skills.json
+          git add skills.json data.json readme
           git diff --staged --quiet \
-            || git commit -m "chore: sync skills from GitHub [skip ci]"
+            || git commit -m "chore: sync skills & rebuild data [skip ci]"
           git push
