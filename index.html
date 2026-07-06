@@ -109,6 +109,7 @@
   let cards        = [];
   let activePrimary = 'skill';
   let activeSubTag  = 'all';
+  let selectedRepo  = null;   // 현재 상세 패널에 열려 있는 스킬
 
   /* ── 정적 데이터 로드 (data.json) ──
      GitHub API를 브라우저에서 직접 호출하지 않는다 → rate limit(IP당 60회/시간) 회피.
@@ -174,6 +175,7 @@
   }
 
   function updateDetail(skill) {
+    selectedRepo = skill.repo;
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
     document.querySelector(`.card[data-repo="${skill.repo}"]`)?.classList.add('active');
 
@@ -210,6 +212,7 @@
   }
 
   function resetDetail() {
+    selectedRepo = null;
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
     document.getElementById('detail-empty').hidden = false;
     document.getElementById('detail-body').hidden = true;
@@ -230,7 +233,7 @@
 
     list.forEach((skill) => {
       const card = document.createElement('div');
-      card.className = 'card';
+      card.className = skill.repo === selectedRepo ? 'card active' : 'card';
       card.dataset.name = (skill.name + ' ' + skill.desc).toLowerCase();
       card.dataset.repo = skill.repo;
       card.innerHTML = `
@@ -320,6 +323,10 @@
       filtered = filtered.filter(c =>
         (c.name + ' ' + c.desc + ' ' + c.repo).toLowerCase().includes(q)
       );
+    }
+    // 열려 있던 스킬이 현재 필터 결과에서 사라졌으면 상세 패널을 닫는다.
+    if (selectedRepo && !filtered.some(c => c.repo === selectedRepo)) {
+      resetDetail();
     }
     render(filtered);
   }
