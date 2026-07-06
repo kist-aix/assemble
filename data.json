@@ -19,7 +19,7 @@
       "emoji": "✨",
       "name": "im-not-ai",
       "desc": "AI가 쓴 글이 아닌 것처럼 윤문해주는 스킬",
-      "stars": 3570,
+      "stars": 3571,
       "category": "skill",
       "subTags": [],
       "url": "https://github.com/kist-aix/im-not-ai",
@@ -78,7 +78,7 @@
       "emoji": "✨",
       "name": "academic-research-skills",
       "desc": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
-      "stars": 36396,
+      "stars": 36398,
       "category": "skill",
       "subTags": [
         "연구"
