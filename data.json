@@ -19,7 +19,7 @@
       "emoji": "✨",
       "name": "im-not-ai",
       "desc": "AI가 쓴 글이 아닌 것처럼 윤문해주는 스킬",
-      "stars": 3571,
+      "stars": 3572,
       "category": "skill",
       "subTags": [],
       "url": "https://github.com/kist-aix/im-not-ai",
@@ -43,7 +43,7 @@
       "emoji": "✨",
       "name": "scientific-agent-skills",
       "desc": "Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 160,000+ scientists worldwide. 140 ready-to-use skills plus 100+ scientific databases covering biology, chemistry, medicine, and drug discovery. Compatible with Cursor, Claude Code, Codex, Pi, Antigravity, and the open Agent Skills standard.",
-      "stars": 30232,
+      "stars": 30235,
       "category": "skill",
       "subTags": [
         "연구"
@@ -78,7 +78,7 @@
       "emoji": "✨",
       "name": "academic-research-skills",
       "desc": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
-      "stars": 36398,
+      "stars": 36401,
       "category": "skill",
       "subTags": [
         "연구"
