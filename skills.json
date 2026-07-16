@@ -11,7 +11,9 @@
       "repo": "hwpx",
       "emoji": "📄",
       "desc": "",
-      "tags": ["문서"]
+      "tags": [
+        "문서"
+      ]
     },
     {
       "repo": "im-not-ai",
@@ -20,12 +22,16 @@
     {
       "repo": "k-skill",
       "emoji": "✨",
-      "tags": ["기타"]
+      "tags": [
+        "기타"
+      ]
     },
     {
       "repo": "scientific-agent-skills",
       "emoji": "✨",
-      "tags": ["연구"]
+      "tags": [
+        "연구"
+      ]
     },
     {
       "repo": "harness",
@@ -38,32 +44,48 @@
     {
       "repo": "academic-research-skills",
       "emoji": "✨",
-      "tags": ["연구"]
+      "tags": [
+        "연구"
+      ]
     },
     {
       "repo": "science-skills",
       "emoji": "✨",
-      "tags": ["연구"]
+      "tags": [
+        "연구"
+      ]
     },
     {
       "repo": "paper-curation",
       "emoji": "✨",
-      "tags": ["연구"]
+      "tags": [
+        "연구"
+      ]
     },
     {
       "repo": "searchinfohwpx",
       "emoji": "✨",
-      "tags": ["문서"]
+      "tags": [
+        "문서"
+      ]
     },
     {
       "repo": "scholar-megasearch",
       "emoji": "✨",
-      "tags": ["연구"]
+      "tags": [
+        "연구"
+      ]
     },
     {
       "repo": "autoresearch",
       "emoji": "✨",
-      "tags": ["연구"]
+      "tags": [
+        "연구"
+      ]
+    },
+    {
+      "repo": "market-analysis-skill",
+      "emoji": "✨"
     }
   ]
 }
