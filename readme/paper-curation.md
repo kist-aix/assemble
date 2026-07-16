@@ -15,7 +15,7 @@
 - **분류·네트워크** — SPECTER2 + HDBSCAN + UMAP로 카테고리를 자동 생성·배정하고 D3.js 인터랙티브 네트워크로 시각화
 - **Deep Research RAG** — 자연어 질의 → hybrid 검색(BM25+dense) → LLM 답변 + `[N]` 인용, 필요하면 **웹 검색 토글**로 코퍼스 밖 근거까지
 - **Audio Overview** — 리뷰·답변을 팟캐스트형 한국어 오디오로(Gemini TTS → 브라우저 MP3, 배포 시 이메일)
-- **paper-curio** — Zotero 플러그인에서 우클릭으로 2~6편 **논문 비교** 리포트(Sonnet 5, 5축)까지 생성
+- **[paper-curio](https://github.com/jehyunlee/paper-curio)** — Zotero 플러그인에서 PDF AI Chat, 2~6편 비교 리포트, 컬렉션 우클릭 전체 처리(리뷰·분류·내러티브·main/category 타임라인, 배포 제외)
 
 🇬🇧 [English README](README.en.md)
 
@@ -32,7 +32,7 @@
 - [파이프라인](#파이프라인)
 - [사용 모드](#사용-모드)
 - [문서](#문서) — Setup / Operations(megasearch · 한국 망 우회 · Concurrency) / Architecture
-- [발표](#발표)
+- [발표/참고자료](#발표참고자료)
 
 ## 📖 독자로 둘러보기
 
@@ -110,7 +110,7 @@ PYTHONUTF8=1 python pipeline/setup.py
 | **같이 보면 좋은 논문** | 임베딩 후보를 Claude가 선별 — 관계 유형 + 한국어 이유 1문장. 망 장애에 강건(multi-round 재시도 + 연결 0개 논문 우선) |
 | **Deep Research** | 자연어 질의 → hybrid 검색(BM25+dense) → LLM 답변 + `[N]` 인용. Anthropic·OpenAI·Google 키 자동 감지 |
 | **Audio Overview** | 리뷰/답변을 팟캐스트형 한국어 오디오로(Gemini TTS, 브라우저 MP3 인코딩 → 다운로드 + 배포 시 이메일) |
-| **타임라인** | 카테고리별 연구 동향 내러티브 + 다이어그램(PaperBanana) |
+| **타임라인** | 카테고리별 연구 동향 내러티브 + 다이어그램(PaperBanana) + main research timeline. `curate`에서도 누락 산출물은 기본 보강 |
 | **지식 축적** | Obsidian 연동 — 메모가 다음 질의에 반영되는 compounding knowledge |
 | **논문 검색/등록** | arXiv·Semantic Scholar·OpenAlex 병렬 검색 + Zotero 자동 등록(선택) |
 
@@ -133,7 +133,7 @@ PYTHONUTF8=1 python pipeline/setup.py
 2. **구조화 리뷰** — Claude가 6섹션 한국어 `review.md`
 3. **토픽 모델링 + 분류** — SPECTER2 + HDBSCAN + UMAP로 카테고리 자동 생성·배정
 4. **같이 보면 좋은 논문** — 임베딩 후보를 Claude가 선별(multi-round 재시도)
-5. **카테고리 요약 + 타임라인** & **Deep Research 검색 인덱스**(BM25 + Gemini 임베딩)
+5. **카테고리 요약 + 타임라인 내러티브/main·category 다이어그램** & **Deep Research 검색 인덱스**(BM25 + Gemini 임베딩)
 6. **토픽 인덱스** `index.html`(Deep Research·Audio Overview 내장) → **로컬 열람**(`serve_local.py`) 또는 **배포**
 
 **브라우저 안에서**: Deep Research(키 자동 감지)와 Audio Overview(Gemini TTS → MP3)가 동작합니다.
@@ -146,11 +146,14 @@ PYTHONUTF8=1 python pipeline/setup.py
 단일 오케스트레이터 `run_full.py` (3축: `--mode` / `--source` / `--images`):
 
 ```bash
-# 주간 운영 — 검색 → Zotero 등록 → sync → 신규만 리뷰
+# 주간 운영 — 검색 → Zotero 등록 → sync → 신규 리뷰 + timeline 보강
 PYTHONUTF8=1 python pipeline/run_full.py --topic ai4s --mode curate --source web --days 7
 
-# 로컬 업데이트 — 검색 스킵
+# 로컬 업데이트 — 검색 스킵, 신규/누락 narrative·timeline 기본 보강
 PYTHONUTF8=1 python pipeline/run_full.py --topic ai4s --mode curate --source zotero
+
+# timeline 보강까지 끄고 리뷰/분류만 돌리려면
+PYTHONUTF8=1 python pipeline/run_full.py --topic ai4s --mode curate --source zotero --images skip
 
 # 분류만 / 타임라인만 / 배포만
 PYTHONUTF8=1 python pipeline/run_full.py --topic ai4s --mode reclassify
@@ -173,7 +176,7 @@ PYTHONUTF8=1 python pipeline/serve_local.py     # http://localhost:8000 + /api/e
 | **[Architecture & Internals](docs/architecture.md)** | 파이프라인 단계 상세 · 신뢰성 설계 · 내부 구조 · Karpathy LLM Wiki 비교 · 요구사항 |
 | **[English README](README.en.md)** | Full English documentation |
 
-## 발표
+## 발표/참고자료
 
 이 프로젝트는 **AAiCON 2026** (국립중앙과학관, 2026.06.25–26)에서 발표되었습니다.
 
@@ -181,6 +184,7 @@ PYTHONUTF8=1 python pipeline/serve_local.py     # http://localhost:8000 + /api/e
 |------|------|
 | **구두 발표** | [260625_이제현_AAiCon.pdf](docs/public/260625_이제현_AAiCon.pdf) |
 | **포스터** | [260625_이제현_AAiCon_poster.pdf](docs/public/260625_이제현_AAiCon_poster.pdf) |
+| **AIX 클리닉 1회** | [AIX 클리닉 1회 (KIST 존슨강당, 2026.07.16.)](docs/public/260715_AIX_clinic_paper_curation.pdf) |
 
 ---
 
