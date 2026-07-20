@@ -2,11 +2,11 @@
   <img src="assets/social-preview.png" alt="im-not-ai — 한글 AI 티 제거기" width="820">
 </p>
 
-# Humanize KR — 한글 AI 티 제거기 v2.0.0
+# Humanize KR — 한글 AI 티 제거기 v2.2.0
 
 AI(ChatGPT · Claude · Gemini 등)가 쓴 한글 글을 **내용은 한 글자도 건드리지 않고** 문체 · 리듬 · 표현만 자연스러운 한국어로 되돌리는 Claude Code 스킬입니다. 
 
-번역투, 과도한 영어 인용, 기계적 병렬 ("첫째 · 둘째 · 셋째"), "결론적으로 / 시사하는 바가 크다" 같은 AI 특유 관용구, 피동태 남용, 문두 접속사 남발, 이모지·불릿 남용 등 **10대 카테고리 × 40+ 서브 패턴**을 심각도(S1/S2/S3)로 분류해 스팬 단위로 탐지한 뒤, 윤문합니다. 
+번역투, 과도한 영어 인용, 기계적 병렬 ("첫째 · 둘째 · 셋째"), "결론적으로 / 시사하는 바가 크다" 같은 AI 특유 관용구, 피동태 남용, 문두 접속사 남발, 이모지·불릿 남용 등 **10대 카테고리 × 70 서브 패턴**(+검증 대기 hold 1건)을 심각도(S1/S2/S3)로 분류해 스팬 단위로 탐지한 뒤, 윤문합니다. 
 
 ## 설치 (Install)
 
@@ -32,7 +32,7 @@ cd im-not-ai
 - Claude: `/humanize-korean` · Codex: `$humanize-korean`
 - 한쪽만: `./install.sh --claude-only` / `--codex-only` · 제거: `./uninstall.sh`
 - **업데이트**: `./update.sh` — 새 버전 자동 감지 후 `git pull` + 재설치(`--check`는 감지만). 마켓플레이스 설치는 `/plugin update`.
-- Codex는 **Fast(단일 호출) 모드만** 제공합니다. 정밀 strict 5인 파이프라인은 Claude Code 전용.
+- Codex는 **단일 콜 경로만** 제공합니다. 다콜 경로(standard 2콜 · heavy 3+콜, 진단·finalize 포함)는 Claude Code 전용.
 
 ## 왜 한글 특화인가
 
@@ -43,7 +43,7 @@ cd im-not-ai
 - "~**에 의해** 생성된" → "~가 만든"
 - "**결론적으로**, 이는 **시사하는 바가 크다**" → (삭제)
 
-이 하네스는 그 한글 고유 패턴을 SSOT로 정리하고, 탐지·윤문·내용 감사·자연스러움 검증을 분리된 에이전트로 수행합니다.
+이 도구는 그 한글 고유 패턴을 SSOT로 정리하고, 글의 상태에 맞는 세 경로(light 1콜 / standard 2콜 / heavy 3+콜) 중 하나로 윤문합니다. 잘 쓴 글일수록 콜 수가 줄어 빠르고 싸게 끝납니다.
 
 ## 4대 철칙
 
@@ -52,49 +52,46 @@ cd im-not-ai
 3. **장르 유지** — 칼럼을 문학으로, 리포트를 에세이로 옮기지 않음.
 4. **과윤문 금지** — 변경률 30% 초과 시 경고, 50% 초과 시 강제 중단.
 
-## 아키텍처 (v1.6)
+## 아키텍처 (v2.2) — route_hint 3경로
 
-**Fast 모드 (디폴트, 5,000자 이하)**
+입력을 shim(`prepare_monolith_input.py`)이 먼저 정량 채점하고, 그 점수로 **`route_hint`(light | standard | heavy)** 를 결정적으로 산출합니다. 글의 상태가 경로를 정하고, 경로가 콜 수를 정합니다. 절감은 모델 교체가 아니라 **콜 수 축소**에서 옵니다(모델 선택은 사용자 몫).
 
-```
-입력 텍스트
-    ↓
-[humanize-monolith]   ── 한 콜 안에서 탐지 → 윤문 → 자체검증 일괄
-    ↓                     (도구 호출 4~5회 캡, opus, ~3분)
-final.md + summary.md
-```
-
-**Strict 모드 (`--strict` 또는 8,000자+ 자동 승급)**
+| 경로 | LLM 콜 수 | 언제 | 파이프라인 |
+|---|---|---|---|
+| **light** | **1** | 잘 쓴 글 — 어휘 티가 거의 0 | 진단·finalize 생략, 보수 강도 단일 윤문. 손댈 게 거의 없으면 "이미 좋습니다"로 조기 종료 |
+| **standard** | **2** | 보통의 AI 초안 — 어휘·구조 티 섞임 | 진단 1콜 + 겨냥 윤문 1콜. 1만자급도 청킹 없이 단일 윤문 콜 |
+| **heavy** | **3+** | 중증 AI 슬롭 밀집 or 초장문(15,000자 초과) or 검증 증적 필요 | 진단 → 윤문(shim이 청크를 2개 이상 만든 경우에만 청크 병렬) → finalize |
 
 ```
 입력 텍스트
     ↓
-[ai-tell-detector]        ── 탐지 (span · category · severity)
+[prepare_monolith_input.py]  ── 정량 사전 점수 (KatFish·post-editese 지표) + route_hint 산출
+    ↓                            실패 시 점수 없이 standard로 자동 진행 (graceful degrade)
+    ├─ light ────→ [humanize-monolith ×1] ────────────────────────────→ final.md
+    ├─ standard ─→ [humanize-diagnostician] → [monolith 겨냥 윤문] ───→ final.md
+    └─ heavy ────→ [diagnostician] → [monolith(필요시 청크 병렬)] → [humanize-finalizer]
     ↓
-[korean-style-rewriter]   ── finding 기반 수술적 윤문
-    ↓
-[병렬 검증 팀]
-    ├─ [content-fidelity-auditor]  ── 13항 체크리스트로 의미 동등성 감사
-    └─ [naturalness-reviewer]      ── 탐지 재실행으로 잔존·과윤문 판정
-    ↓
-[오케스트레이터 종합]
-    ├─ accept              → final.md + summary.md
-    ├─ rewrite_round_2     → 2차 윤문 (최대 3회)
-    ├─ rollback_and_rewrite → 문제 edit 롤백
-    └─ hold_and_report     → 사람 검토 권고
+[verify_change_rate.py]      ── 변경률 게이트 (결정적 코드 판정, exit code) — 모든 경로 공통
 ```
 
-## 7인 에이전트
+- 사용자 명시가 route_hint를 오버라이드합니다: `--strict`·"정밀 모드" → heavy 고정, "가볍게" → light 고정.
+- **단일 콜 우선**: 청킹은 heavy 전용이며 15,000자 이하는 비권장. 실측으로 1만자 글을 청킹 7콜로 돌리면 610K 토큰, 단일 콜이면 134K(4.5배 절감, 품질 동등)였습니다 — 청크마다 룰북·진단을 재로드하는 비용이 절감분을 다 먹기 때문입니다.
+- 이번 개선의 핵심 가치: **잘 쓴 글은 1콜로 싸게 끝납니다.** 어휘 티 없는 글에 최중량 파이프라인을 돌리던 낭비를 route_hint가 차단합니다.
 
-| 에이전트 | 모드 | 역할 |
+## 에이전트 구성
+
+윤문 실행에 쓰이는 에이전트는 아래 4개입니다.
+
+| 에이전트 | 경로 | 역할 |
 |---------|---|------|
-| `humanize-monolith` | **Fast 디폴트** | 단일 호출 윤문 (탐지·윤문·자체검증 일괄, 도구 호출 4~5회 캡) |
-| `ai-tell-detector` | Strict | span 단위 JSON 탐지 리포트 생성 |
-| `korean-style-rewriter` | Strict | finding 기반 수술적 윤문, 변경률 모니터링 |
-| `content-fidelity-auditor` | Strict | 의미 동등성 감사 (13항), 훼손 시 롤백 지시 |
-| `naturalness-reviewer` | Strict | 잔존 AI 티 · 과윤문 · 자연도 판정, 품질 등급 A~D |
+| `humanize-monolith` | 전 경로 공용 | 단일 호출 윤문 (탐지·윤문·자체검증 일괄, 도구 호출 3회 캡) |
+| `humanize-diagnostician` | standard·heavy | 글 전체의 지배 패턴 3~6개 진단, taxonomy ID + 처방 |
+| `humanize-finalizer` | heavy | 원문 직접 대조로 의미 보존 15항 + 자연성 판정, 국소 보정 |
 | `korean-ai-tell-taxonomist` | 별도 명령 | 분류 체계(SSOT) 관리, 신규 패턴 심사 승격 |
-| `humanize-web-architect` | 옵션 | Next.js 15 + Vercel 웹 서비스 확장 설계 |
+
+이 외에 `agents/`에는 릴리스 회차 전용 개발 도구 5개(`translationese-research-distiller` · `korean-translation-scholar` · `taxonomy-gap-analyzer` · `post-editese-metric-engineer` · `quick-rules-integrator` — v2.0 학술 흡수 작업용, 윤문 실행과 무관)가 함께 들어 있습니다.
+
+옛 strict 5인 파이프라인의 `ai-tell-detector` · `korean-style-rewriter` · `content-fidelity-auditor` · `naturalness-reviewer`와 웹 확장 설계용 `humanize-web-architect`는 **v2.1에서 은퇴**했습니다(아래 v2.1 릴리스 노트 참조).
 
 ## AI 티 분류 체계 (요약)
 
@@ -111,7 +108,7 @@ final.md + summary.md
 | I | 형식명사 과다 | "것이다", "점", "수", "바", "~할 필요가 있다" |
 | J | 시각 장식 남용 | 과도한 **볼드**, "따옴표", 대시(—) 남발 |
 
-전체 60+ 서브 패턴과 처방: [`ai-tell-taxonomy.md`](.claude/skills/humanize-korean/references/ai-tell-taxonomy.md) · [`rewriting-playbook.md`](.claude/skills/humanize-korean/references/rewriting-playbook.md) · 학술 인용 외부 SSOT: [`scholarship.md`](.claude/skills/humanize-korean/references/scholarship.md) (v2.0 신규)
+전체 70 서브 패턴(+hold 1건)과 처방: [`ai-tell-taxonomy.md`](.claude/skills/humanize-korean/references/ai-tell-taxonomy.md) · [`rewriting-playbook.md`](.claude/skills/humanize-korean/references/rewriting-playbook.md) · 학술 인용 외부 SSOT: [`scholarship.md`](.claude/skills/humanize-korean/references/scholarship.md) (v2.0 신규)
 
 ## 심각도 & 품질 등급
 
@@ -195,9 +192,9 @@ Claude Code에서는 세 가지 방법 중 편한 쪽으로 사용합니다. Cod
 /plugin install humanize-korean@im-not-ai
 ```
 
-스킬 3개 + 서브에이전트 12개가 함께 설치됩니다. 자세한 옵션·스크립트 설치는 [설치](#설치-install) 섹션과 [`INSTALL.md`](INSTALL.md) 참고. (초기 패키징을 탐색한 [`gaebalai/im-not-ai`](https://github.com/gaebalai/im-not-ai) 포크도 있습니다.)
+스킬 3개 + 서브에이전트 9개가 함께 설치됩니다. 자세한 옵션·스크립트 설치는 [설치](#설치-install) 섹션과 [`INSTALL.md`](INSTALL.md) 참고. (초기 패키징을 탐색한 [`gaebalai/im-not-ai`](https://github.com/gaebalai/im-not-ai) 포크도 있습니다.)
 
-**방법 D — Codex CLI (공식, Fast 모드)**
+**방법 D — Codex CLI (공식, 단일 콜 경로)**
 
 본체가 이제 Codex CLI Skills를 **공식 지원**합니다. 리포 클론 후 한 줄이면 `~/.codex/skills/`에 연결됩니다:
 
@@ -206,7 +203,7 @@ git clone https://github.com/epoko77-ai/im-not-ai.git && cd im-not-ai
 ./install.sh --codex-only
 ```
 
-Codex에서 `$humanize-korean`으로 발동합니다(또는 `/skills` 메뉴). Codex는 단일 호출 **Fast 모드**만 제공하며, 정밀 strict 5인 파이프라인은 Claude Code 전용입니다. (Codex Desktop용 별도 어댑터로는 community 포트 [`Squirbie/im-not-ai-codex`](https://github.com/Squirbie/im-not-ai-codex)도 있습니다.)
+Codex에서 `$humanize-korean`으로 발동합니다(또는 `/skills` 메뉴). Codex는 **단일 콜 경로만** 제공하며, 다콜 경로(standard 2콜 · heavy 3+콜, 진단·finalize 포함)는 Claude Code 전용입니다. (Codex Desktop용 별도 어댑터로는 community 포트 [`Squirbie/im-not-ai-codex`](https://github.com/Squirbie/im-not-ai-codex)도 있습니다.)
 
 **방법 E — Web UI (비공식)**
 
@@ -215,27 +212,29 @@ opencode 로 윤문하는 커뮤니티 제작 포트입니다.
 
 ### 4. 결과 확인
 
-Claude Code가 입력 길이·옵션에 따라 두 모드 중 하나로 처리합니다.
+정량 사전 채점이 산출한 `route_hint`에 따라 세 경로 중 하나로 처리합니다(사용자 명시가 오버라이드).
 
-**Fast 모드 (디폴트, 5,000자 이하 · ~3분)** — `humanize-monolith` 한 콜이 메모리 안에서 탐지·윤문·자체검증을 모두 끝냅니다. 산출물은 `_workspace/{실행날짜-번호}/`에 두 파일:
+**light (1콜 · 잘 쓴 글 · 1~2분)** — 진단·finalize 없이 `humanize-monolith` 한 콜이 보수 강도로 윤문합니다. 손댈 게 거의 없으면 "이미 좋습니다"와 손댄 곳 요약으로 조기 종료합니다.
+
+**standard (2콜 · 보통의 AI 초안 · 2~5분)** — 진단 1콜이 지배 패턴을 짚고, 겨냥 윤문 1콜이 처리합니다. 1만자급도 청킹 없이 단일 윤문 콜입니다.
+
+산출물은 `_workspace/{실행날짜-번호}/`에:
 
 | 파일 | 내용 |
 |------|------|
 | `01_input.txt` | 원문 그대로 |
+| `00_metrics.json` · `01_input_with_metrics.txt` | 정량 사전 점수 + `route_hint` + 점수 블록을 원문 앞에 붙인 결합 입력 (점수 계산 실패 시 standard로 자동 진행) |
+| `02_diagnosis.md` | (standard·heavy) 지배 패턴 3~6개 진단 (taxonomy ID · 근거 · 처방 · 장르/격식) |
 | `final.md` | 윤문본 + 본문 끝 `<!-- HUMANIZE-SUMMARY -->` 주석 블록(메트릭·카테고리 탐지 before/after·자체검증 6항·등급·주요 변경 하이라이트). HTML 주석이라 마크다운 뷰어·웹 게시·복사 시 본문에만 노출 |
 
-**Strict 모드 (`--strict` 또는 8,000자+ 자동 승급 · 더 정밀)** — 5인 파이프라인이 단계별 산출물을 분리해 저장합니다:
+**heavy (3+콜 · 중증 슬롭·초장문·증적 필요 · `--strict`로 강제 가능 · 5~8분)** — 진단 → 윤문(shim이 청크를 2개 이상 만든 경우에만 청크 병렬) → finalize. 위 산출물에 더해:
 
 | 파일 | 내용 |
 |------|------|
-| `01_input.txt` | 원문 그대로 |
-| `02_detection.json` | AI 티 탐지 리포트 (위치·종류·심각도) |
-| `03_rewrite.md` | 윤문본 |
-| `04_fidelity_audit.json` | 내용 훼손 감사 결과 |
-| `05_naturalness_review.json` | 자연도 재측정 결과 |
-| `final.md` + `summary.md` | 최종 윤문본 + 점수·주요 변경·등급 요약 |
+| `final_pre_finalize.md` | finalize 보정 전 윤문본 백업 |
+| `09_finalize.json` | 의미 보존 15항 + 자연성 판정 결과 |
 
-부분 재실행("이 카테고리만 다시"·"2차 윤문")은 strict 모드로 자동 전환됩니다.
+부분 재실행("이 카테고리만 다시"·"2차 윤문")은 heavy 경로로 자동 전환됩니다.
 
 ### 5. 결과가 맘에 안 들면
 
@@ -261,9 +260,36 @@ Claude Code 세션 안에서 새 글을 붙여넣고 똑같이 부탁하면 됩�
 
 ## 웹 서비스 확장 (옵션)
 
-`humanize-web-architect` 에이전트가 Next.js 15 App Router + Vercel Fluid Compute + AI Gateway 기반 웹앱 설계를 담당한다. UX는 4화면(입력 → 탐지 하이라이트 → 좌우 diff → 윤문본 복사). 상세: [`web-service-spec.md`](.claude/skills/humanize-korean/references/web-service-spec.md).
+웹 버전은 별도 코드베이스로 운영 중입니다. 본 리포의 설계 문서 [`web-service-spec.md`](.claude/skills/humanize-korean/references/web-service-spec.md)는 산출물로 보존합니다 (설계 담당이던 `humanize-web-architect` 에이전트는 v2.1에서 은퇴).
 
-로드맵: v0 MVP(익명·단일 호출) → v1(로그인·히스토리) → v2(Pro/Team · API · 웹훅) → v3(Chrome Extension) → v4(일본어·중국어 확장).
+## v2.2 — route_hint 3경로 · 단일 콜 우선 (2026-07)
+
+shim이 정량 점수로 `route_hint`(light | standard | heavy)를 결정적으로 산출하고, 그 힌트가 콜 수를 정하는 구조로 재편했습니다. 구 "fast 1콜 / 정밀 3콜" 이분법을 대체합니다.
+
+**왜 재편했나** — 1만자 글을 청킹 7콜로 돌린 실측이 610K 토큰이었는데, 같은 글을 단일 콜로 돌리면 134K에 품질 동등이었습니다. 청크마다 룰북·진단을 재로드하는 비용이 폭발 원인이었습니다. 또 어휘 티가 거의 없는 잘 쓴 글에도 최중량 파이프라인을 돌리고 있었습니다.
+
+**핵심 변경**
+
+- **route_hint 3경로** — light(1콜: 진단·finalize 생략, 손댈 게 없으면 "이미 좋습니다" 조기 종료) / standard(2콜: 진단 + 단일 윤문) / heavy(3+콜: 진단 → 윤문 → finalize). 사용자 명시(`--strict`·"가볍게")가 힌트를 오버라이드
+- **단일 콜 우선** — 청킹은 heavy 전용, 15,000자 이하 비권장. shim이 실제로 청크를 2개 이상 만들 때만 병렬
+- 절감은 **콜 수**에서 옵니다. 모델 티어는 강제하지 않으며 사용자 선택입니다
+
+## v2.1 — 정밀 모드 3콜 재편 (2026-07)
+
+옛 strict 5인 파이프라인(detector → rewriter → 병렬 fidelity·naturalness → 판정 매트릭스)을 **진단 1콜 → 겨냥 윤문(monolith 재사용) → finalize 1콜**의 3콜 구조로 대체했습니다.
+
+**왜 재편했나**
+
+- span 열거 탐지는 같은 글에서 0↔18개로 요동칠 만큼 불안정했고, taxonomy 전체를 두 에이전트가 중복 로드해 탐지 단계만 wall-clock의 54%를 차지했습니다.
+- 판정 매트릭스가 LLM 재탐지에 의존해 느리고 비쌌습니다.
+- 같은 엔진의 웹 구현이 "지배 패턴 진단 1콜 + 결정적 변경률 게이트" 치환을 먼저 검증했습니다 — 진단 없는 윤문은 잘 쓰인 AI 글에서 변경률 0.5%(사실상 no-op)였고, 진단을 붙이자 11%로 뛰며 5인 파이프라인과 동급이 됐습니다. 그 결과를 이식한 것입니다.
+
+**핵심 변경**
+
+- **신규 에이전트 2종** — `humanize-diagnostician`(글 전체의 지배 패턴 3~6개 진단, span을 세지 않음) · `humanize-finalizer`(원문↔윤문본 직접 대조로 의미 보존 15항 + 자연성 양방향 판정, 문제 구간만 국소 보정 — 전체 재작성 금지로 의미 드리프트 차단)
+- **은퇴 5종** — `ai-tell-detector` · `korean-style-rewriter` · `content-fidelity-auditor` · `naturalness-reviewer`(역할이 진단·finalize 콜로 통합) · `humanize-web-architect`(웹은 별도 코드베이스로 운영, 설계 문서만 보존)
+- **수렴 판정의 결정화** — 변경률 게이트를 LLM 재탐지 대신 `scripts/verify_change_rate.py`(exit code)가 판정. 이 수치가 SSOT
+- **fast 장문 청킹** — 6,000자 초과 입력은 결정적 분할(`--chunk`, 문단·문장 경계) 후 청크 병렬 윤문 → `scripts/reassemble_chunks.py` 재조립. 구 "8,000자+ strict 자동 승급"(긴 입력을 가장 느린 경로로 보내는 속도 역전) 폐지 — 정밀 모드는 길이가 아니라 진단·검증 증적이 필요할 때 고르는 모드입니다
 
 ## v2.0 — 한국 번역학계 8유형 + post-editese metric 트랙 (A-17 hold) (2026-05-07)
 
@@ -288,7 +314,7 @@ v1.6이 KatFish/LREAD 정량 결정타로 잔존 약점을 잡았다면, v2.0은
 |---|---|---|
 | Phase 5 (재윤문 없음) | v1.6 본질 테스트 5편 (003~007) | 회귀 0건. lexical_diversity 5편 전수 상승(post-editese 단순화 가설 1차 반증). interference_index 4/5 감소(평균 -0.176) |
 | 외부 회차 | 위키피디아 영-한 NMT 번역체 6편 | A-16 양성 **3/6 (50%)**, A-18 양성 **4/6 (67%)** — 영-한 NMT 번역체에서 신규 패턴 작동 입증. interference_index 외부 평균 0.251 vs v1.6 0.05~0.10 — Toral 2019 간섭 가설 1차 부합 |
-| pytest | v1.6 13 + v2.0 31 | 신규 함수 호출·alias·v1.6 시그니처 보존 모두 통과 |
+| pytest | metrics 단위 테스트 (v1.6 + v2.0) | **94개 전체 통과** (v2.0.1에서 fresh clone 경로 수리 후 재검증) |
 
 **한계 — 다음 회차 과제**
 
@@ -548,4 +574,4 @@ v1.2까지의 외부 기여자: **[@simonsez9510](https://github.com/simonsez951
 
 ---
 
-Built with [Claude Code](https://claude.com/claude-code) + https://github.com/revfactory/harness 하네스 아키텍처 기반 프로젝트.
+Built with [Claude Code](https://claude.com/claude-code) + [revfactory/harness](https://github.com/revfactory/harness) 아키텍처 기반 프로젝트.

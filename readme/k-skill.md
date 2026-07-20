@@ -53,6 +53,7 @@ Claude Code, Codex, OpenCode, OpenClaw/ClawHub 등 각종 코딩 에이전트 �
 | 인허가 영업상태 조회 | `localdata-business-status` | 상호+시군구로 동네 사업장(208업종)의 영업/휴업/폐업·업력·주소 조회(LOCALDATA 무인증) | 불필요 | [인허가 영업상태 조회 가이드](docs/features/localdata-business-status.md) |
 | 창업진흥원 K-Startup 조회 | `kstartup-search` | 창업진흥원 K-Startup 통합공고 사업·지원사업 공고·창업 콘텐츠·통계보고서 조회 (공공데이터포털 15125364, 프록시 경유) | 불필요 | [창업진흥원 K-Startup 조회 가이드](docs/features/kstartup-search.md) |
 | 지방선거 후보자 조회 | `local-election-candidate-search` | 중앙선거관리위원회 선거통계시스템 공개 통합검색으로 지방선거 후보자 이력·선거종류·정당·지역·득표 정보를 이름 기준으로 조회 | 불필요 | [지방선거 후보자 조회 가이드](docs/features/local-election-candidate-search.md) |
+| 공무국외출장 보고서 조회 | `gov-overseas-trip-report` | 선관위·권익위·정보공개포털·대구/대전/경기/경북 의회 등 공개 표면에서 국외출장/훈련 보고서·현황을 조회하고, 표 밖 기관은 discover로 능동 탐색(로그인 벽 제외, 판정 아님) | 불필요 | [공무국외출장 보고서 조회 가이드](docs/features/gov-overseas-trip-report.md) |
 | 러브버그.com 조회·제보 | `lovebug-report` | 러브버그.com 공개 지도 JSON으로 수도권 시·구별 출몰 지수·동네별 제보 현황을 조회하고, 사용자가 제공한 현재 좌표로 익명 러브버그 제보 제출 | 불필요 | [러브버그.com 조회·제보 가이드](docs/features/lovebug-report.md) |
 | 한국 사업자 장부 자동화 | `korean-jangbu-for` | `kimlawtech/korean-jangbu-for` 기반 카드·은행·영수증·세금계산서 입력 → 표준 거래내역·계정과목·세무사 전달 CSV·경영 리포트 생성 thin wrapper | 선택사항(CODEF BYOK 자동 수집 시 필요) | [한국 사업자 장부 자동화 가이드](docs/features/korean-jangbu-for.md) |
 | 팝빌 업무 API | `popbill` | 팝빌 전자세금계산서·전자명세서·현금영수증·문자·카카오톡·팩스·휴폐업/기업정보·계좌조회·홈택스 수집을 로컬 BYOK 방식으로 호출 | 필요 | [팝빌 all-service API helper](docs/features/popbill.md) |
@@ -120,6 +121,7 @@ Claude Code, Codex, OpenCode, OpenClaw/ClawHub 등 각종 코딩 에이전트 �
 | 네이버 쇼핑 가격비교 | `naver-shopping-search` | 네이버 검색 Open API 우선, 공개 BFF JSON fallback으로 상품 후보·현재 노출가·판매처 링크 비교 | 불필요 | [네이버 쇼핑 가격비교 가이드](docs/features/naver-shopping-search.md) |
 | 다나와 최저가 비교 | `danawa-price-search` | 다나와 공개 검색/가격비교 표면으로 상품 후보·쇼핑몰별 가격·배송비 포함 실구매가·카드 할인가·무이자 할부 비교 | 불필요 | [다나와 최저가 비교 가이드](docs/features/danawa-price-search.md) |
 | 네이버 뉴스 검색 | `naver-news-search` | 네이버 검색 Open API 뉴스 검색으로 기사 제목·요약·발행시각·원문/네이버 링크를 정리 | 불필요 | [네이버 뉴스 검색 가이드](docs/features/naver-news-search.md) |
+| 네이버 검색광고 성과 조회 | `naver-ad-performance` | 네이버 검색광고 캠페인/광고그룹/키워드의 노출수·클릭수·광고비·CTR·CPC·전환수 조회, 연관키워드·월간 조회수 도구 (읽기 전용, 로컬 실행 전용) | 필요 | [네이버 검색광고 성과 조회 가이드](docs/features/naver-ad-performance.md) |
 | 한국어 글자 수 세기 | `korean-character-count` | 한국어 텍스트의 글자 수·줄 수·UTF-8/NEIS byte 수를 결정론적으로 계산 | 불필요 | [한국어 글자 수 세기 가이드](docs/features/korean-character-count.md) |
 | 한국어 유행어 글쓰기 | `korean-slang-writing` | 나무위키 유행어 기반 큐레이션 시드로 한국 유행어 후보 조회, 무드/문맥/safety 필터 및 나무위키 best-effort 요약으로 한국어 글을 유행어 느낌으로 작성 | 불필요 | [한국어 유행어 글쓰기 가이드](docs/features/korean-slang-writing.md) |
 | 한국어 AI 윤문 | `korean-humanizer` | AI가 쓴 티 나는 한국어 글을 번역체·AI 상투어·과장된 의의·줄표/이모지 등 흔적을 심각도(S1/S2/S3)로 분류해 의미는 보존하며 사람 글로 윤문, 목표 글자수도 맞춤 | 불필요 | [한국어 AI 윤문 가이드](docs/features/korean-humanizer.md) |
