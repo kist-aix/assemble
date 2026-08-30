@@ -19,7 +19,7 @@
       "emoji": "✨",
       "name": "im-not-ai",
       "desc": "AI가 쓴 한글을 사람 글처럼 윤문하는 Claude 스킬 — Korean AI-text humanizer: detects and rewrites translationese, mechanical parallelism, and 71 other AI tells",
-      "stars": 5075,
+      "stars": 5086,
       "category": "skill",
       "subTags": [],
       "url": "https://github.com/kist-aix/im-not-ai",
@@ -30,7 +30,7 @@
       "emoji": "✨",
       "name": "k-skill",
       "desc": "한국인을 위한 스킬 모음집 - 에이전트를 한국인으로",
-      "stars": 7361,
+      "stars": 7366,
       "category": "skill",
       "subTags": [
         "기타"
@@ -42,8 +42,8 @@
       "repo": "scientific-agent-skills",
       "emoji": "✨",
       "name": "scientific-agent-skills",
-      "desc": "Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 175,000+ scientists worldwide. 163 ready-to-use validated skills plus 100+ scientific databases covering biology, chemistry, medicine, and drug discovery. Compatible with Cursor, Claude Code, Codex, Pi, Antigravity, and the open Agent Skills standard.",
-      "stars": 36948,
+      "desc": "Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 190,000+ scientists worldwide. 165 ready-to-use validated skills plus 100+ scientific databases covering biology, chemistry, medicine, and drug discovery. Compatible with Cursor, Claude Code, Codex, Pi, Antigravity, and the open Agent Skills standard.",
+      "stars": 38070,
       "category": "skill",
       "subTags": [
         "연구"
@@ -56,7 +56,7 @@
       "emoji": "✨",
       "name": "harness",
       "desc": "A meta-skill that designs domain-specific agent teams, defines specialized agents, and generates the skills they use.",
-      "stars": 8851,
+      "stars": 8854,
       "category": "harness",
       "subTags": [],
       "url": "https://github.com/kist-aix/harness",
@@ -67,7 +67,7 @@
       "emoji": "✨",
       "name": "harness-100",
       "desc": "Harness 100",
-      "stars": 1251,
+      "stars": 1253,
       "category": "harness",
       "subTags": [],
       "url": "https://github.com/kist-aix/harness-100",
@@ -78,7 +78,7 @@
       "emoji": "✨",
       "name": "academic-research-skills",
       "desc": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
-      "stars": 44114,
+      "stars": 44189,
       "category": "skill",
       "subTags": [
         "연구"
@@ -91,7 +91,7 @@
       "emoji": "✨",
       "name": "science-skills",
       "desc": "GDM Science Skills to speed up agentic scientific workflows with better grounding and higher token efficiency. Integrate insights from AlphaGenome, AFDB, UniProt and 30+ other databases and tools.",
-      "stars": 2786,
+      "stars": 2792,
       "category": "skill",
       "subTags": [
         "연구"
@@ -130,7 +130,7 @@
       "emoji": "✨",
       "name": "scholar-megasearch",
       "desc": "Massive multi-source academic literature search for Claude Code — one skill fans out subagents across 20+ scholarly databases (arXiv, Semantic Scholar, Crossref, OpenAlex, PubMed, …), merges into a deduplicated ranked corpus, and acquires the original PDFs.",
-      "stars": 26,
+      "stars": 27,
       "category": "skill",
       "subTags": [
         "연구"
@@ -143,7 +143,7 @@
       "emoji": "✨",
       "name": "autoresearch",
       "desc": "Claude Autoresearch Skill — Autonomous goal-directed iteration for Claude Code. Inspired by Karpathy's autoresearch. Modify → Verify → Keep/Discard → Repeat forever.",
-      "stars": 5957,
+      "stars": 5963,
       "category": "skill",
       "subTags": [
         "연구"
