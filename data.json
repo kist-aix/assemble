@@ -30,7 +30,7 @@
       "emoji": "✨",
       "name": "k-skill",
       "desc": "한국인을 위한 스킬 모음집 - 에이전트를 한국인으로",
-      "stars": 7569,
+      "stars": 7571,
       "category": "skill",
       "subTags": [
         "기타"
@@ -43,7 +43,7 @@
       "emoji": "✨",
       "name": "scientific-agent-skills",
       "desc": "Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 190,000+ scientists worldwide. 165 ready-to-use validated skills plus 100+ scientific databases covering biology, chemistry, medicine, and drug discovery. Compatible with Cursor, Claude Code, Codex, Pi, Antigravity, and the open Agent Skills standard.",
-      "stars": 45061,
+      "stars": 45068,
       "category": "skill",
       "subTags": [
         "연구"
@@ -78,7 +78,7 @@
       "emoji": "✨",
       "name": "academic-research-skills",
       "desc": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
-      "stars": 48205,
+      "stars": 48212,
       "category": "skill",
       "subTags": [
         "연구"
@@ -91,7 +91,7 @@
       "emoji": "✨",
       "name": "science-skills",
       "desc": "GDM Science Skills to speed up agentic scientific workflows with better grounding and higher token efficiency. Integrate insights from AlphaGenome, AFDB, UniProt and 30+ other databases and tools.",
-      "stars": 3052,
+      "stars": 3053,
       "category": "skill",
       "subTags": [
         "연구"
