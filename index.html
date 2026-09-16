@@ -2,15 +2,356 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=./ai4sci/" />
-  <link rel="canonical" href="./ai4sci/" />
-  <title>AssembIe</title>
-  <script>
-    // 쿼리·해시를 보존하며 /ai4sci/ 로 이동
-    location.replace('./ai4sci/' + location.search + location.hash);
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AssembIe — Claude Code Skills</title>
+  <link rel="stylesheet" href="src/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 </head>
 <body>
-  <p><a href="./ai4sci/">AI4Sci 페이지로 이동합니다…</a></p>
+
+<!-- ════════════════════════════════
+     ⚙️  설정 — skills.json 에서 관리
+     ════════════════════════════════ -->
+<script>
+  // 페이지 제목 / 설명만 여기서 관리합니다.
+  // GitHub 계정명 · 스킬 목록은 skills.json 을 수정하세요.
+  const PAGE_TITLE    = 'AssembIe';
+  const PAGE_SUBTITLE = '원하는 스킬의 URL을 복사해 Claude Code에서 사용해보세요.';
+</script>
+<!-- ════════════════════════════════ -->
+
+<header>
+  <p class="dept">KIST AIX전략실</p>
+  <div class="logo">
+    <span><span style="color:#e44126">A</span>ssemb<span style="color:#e44126">I</span>e</span>
+  </div>
+  <p id="page-subtitle"></p>
+  <div class="hero-search-wrap">
+    <div class="search-wrap">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input id="search" type="search" placeholder="키워드 검색…" autocomplete="off" />
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-tab="skill">Skill</button>
+  <button class="tab" data-tab="harness">Harness</button>
+</div>
+
+<div id="sub-tabs" class="sub-tabs"></div>
+
+<div class="content-wrap">
+  <div class="main-col">
+    <div id="grid" class="grid"></div>
+    <div id="state" class="state-wrap"></div>
+  </div>
+  <aside class="detail-panel" id="detail-panel">
+    <div class="detail-empty" id="detail-empty">
+      <p id="detail-hint">궁금한 스킬을 눌러보세요.</p>
+    </div>
+    <div id="detail-body" hidden>
+      <div class="drawer-header">
+        <div class="drawer-title-row">
+          <span class="drawer-name" id="detail-name"></span>
+          <span class="card-stars">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span id="detail-stars"></span>
+          </span>
+        </div>
+        <div id="detail-tags" class="card-tags"></div>
+        <p class="drawer-desc" id="detail-desc"></p>
+        <div class="card-actions">
+          <button class="btn-copy" id="detail-copy-btn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            URL 복사
+          </button>
+          <a class="btn-gh" id="detail-gh-link" href="#" target="_blank" rel="noopener">
+            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+      <div class="drawer-readme-wrap">
+        <div class="drawer-readme-label">README</div>
+        <div id="detail-readme" class="readme-content"></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <a href="https://github.com/${GITHUB_USER}" target="_blank" rel="noopener" id="footer-link">
+    Github
+  </a>
+  &nbsp;·&nbsp; AssembIe
+</footer>
+
+<script>
+  /* ── 초기화 ── */
+  document.title = PAGE_TITLE + ' — Claude Code Skills';
+  document.getElementById('page-subtitle').textContent = PAGE_SUBTITLE;
+
+  const grid   = document.getElementById('grid');
+  const state  = document.getElementById('state');
+  const search = document.getElementById('search');
+
+
+  let GITHUB_USER = '';
+  let cards        = [];
+  let activePrimary = 'skill';
+  let activeSubTag  = 'all';
+  let selectedRepo  = null;   // 현재 상세 패널에 열려 있는 스킬
+
+  /* ── 정적 데이터 로드 (data.json) ──
+     GitHub API를 브라우저에서 직접 호출하지 않는다 → rate limit(IP당 60회/시간) 회피.
+     data.json / readme/*.md 는 GitHub Actions가 매일 미리 구워서 커밋한다. */
+  async function loadSkills() {
+    state.innerHTML = '<div class="spinner"></div>스킬 목록을 불러오는 중…';
+
+    let data;
+    try {
+      const res = await fetch('./data.json');
+      if (!res.ok) throw new Error('data.json을 불러오지 못했습니다.');
+      data = await res.json();
+    } catch (e) {
+      state.innerHTML = `데이터를 불러오지 못했습니다. (${e.message})`;
+      return;
+    }
+
+    GITHUB_USER = data.github_user;
+    document.getElementById('footer-link').href = `https://github.com/${GITHUB_USER}`;
+
+    state.innerHTML = '';
+    cards = data.skills;
+    renderSubTabs();
+    applyFilters();
+  }
+
+  /* ── 복사 헬퍼 ── */
+  async function copyToClipboard(url) {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+  }
+
+  function flashCopied(btn) {
+    const orig = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = `
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+      복사 완료
+    `;
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 1800);
+  }
+
+  /* ── 드로어 ── */
+  async function fetchReadme(repo) {
+    try {
+      const res = await fetch(`./readme/${repo}.md`);
+      if (!res.ok) return null;
+      return await res.text();
+    } catch {
+      return null;
+    }
+  }
+
+  function updateDetail(skill) {
+    selectedRepo = skill.repo;
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.querySelector(`.card[data-repo="${skill.repo}"]`)?.classList.add('active');
+
+    document.getElementById('detail-name').textContent = skill.name;
+    document.getElementById('detail-stars').textContent = skill.stars.toLocaleString();
+    document.getElementById('detail-desc').textContent = skill.desc;
+
+    const tagsEl = document.getElementById('detail-tags');
+    if (skill.subTags.length) {
+      tagsEl.innerHTML = skill.subTags.map(t => `<span class="card-tag">${t}</span>`).join('');
+      tagsEl.style.display = 'flex';
+    } else {
+      tagsEl.innerHTML = '';
+      tagsEl.style.display = 'none';
+    }
+
+    const copyBtn = document.getElementById('detail-copy-btn');
+    copyBtn.onclick = async () => {
+      await copyToClipboard(skill.url);
+      flashCopied(copyBtn);
+    };
+    document.getElementById('detail-gh-link').href = skill.url;
+
+    document.getElementById('detail-empty').hidden = true;
+    document.getElementById('detail-body').hidden = false;
+
+    document.getElementById('detail-body').scrollTop = 0;
+    const readmeEl = document.getElementById('detail-readme');
+    readmeEl.innerHTML = '<div class="readme-loading"><div class="spinner"></div><span>README 불러오는 중…</span></div>';
+
+    fetchReadme(skill.repo).then(text => {
+      readmeEl.innerHTML = text ? marked.parse(text) : '<p class="readme-empty">README를 불러올 수 없습니다.</p>';
+    });
+  }
+
+  function resetDetail() {
+    selectedRepo = null;
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.getElementById('detail-empty').hidden = false;
+    document.getElementById('detail-body').hidden = true;
+    document.getElementById('detail-hint').textContent =
+      activePrimary === 'harness' ? '궁금한 하네스를 눌러보세요.' : '궁금한 스킬을 눌러보세요.';
+  }
+
+  /* ── 카드 렌더링 ── */
+  function render(list) {
+    grid.innerHTML = '';
+
+    if (list.length === 0) {
+      state.innerHTML = '검색 결과가 없어요.';
+      return;
+    }
+
+    state.innerHTML = '';
+
+    list.forEach((skill) => {
+      const card = document.createElement('div');
+      card.className = skill.repo === selectedRepo ? 'card active' : 'card';
+      card.dataset.name = (skill.name + ' ' + skill.desc).toLowerCase();
+      card.dataset.repo = skill.repo;
+      card.innerHTML = `
+        <div class="card-top">
+          <span class="card-name">${skill.name}</span>
+          <span class="card-stars">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            ${skill.stars.toLocaleString()}
+          </span>
+        </div>
+        ${skill.subTags.length ? `<div class="card-tags">${skill.subTags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>` : ''}
+        <div class="card-desc">${skill.desc}</div>
+        <div class="card-actions">
+          <button class="btn-copy">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            URL 복사
+          </button>
+          <a class="btn-gh" href="${skill.url}" target="_blank" rel="noopener">
+            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
+      `;
+
+      card.addEventListener('click', () => updateDetail(skill));
+
+      const copyBtn = card.querySelector('.btn-copy');
+      copyBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await copyToClipboard(skill.url);
+        flashCopied(copyBtn);
+      });
+
+      card.querySelector('.btn-gh').addEventListener('click', (e) => e.stopPropagation());
+
+      grid.appendChild(card);
+    });
+
+    requestAnimationFrame(syncPanelHeight);
+  }
+
+  function syncPanelHeight() {
+    const panel = document.getElementById('detail-panel');
+    const mainCol = document.querySelector('.main-col');
+    if (!mainCol) return;
+    const pb = parseInt(getComputedStyle(mainCol).paddingBottom) || 0;
+    panel.style.height = (mainCol.offsetHeight - pb) + 'px';
+  }
+
+  /* ── 서브탭 렌더링 ── */
+  function renderSubTabs() {
+    const el = document.getElementById('sub-tabs');
+    const primaryCards = cards.filter(c => c.category === activePrimary);
+    const allTags = [...new Set(primaryCards.flatMap(c => c.subTags))].sort((a, b) => {
+      if (a.startsWith('기타') && !b.startsWith('기타')) return 1;
+      if (!a.startsWith('기타') && b.startsWith('기타')) return -1;
+      return a.localeCompare(b, 'ko');
+    });
+    if (allTags.length === 0) { el.innerHTML = ''; return; }
+    el.innerHTML = ['all', ...allTags].map(tag =>
+      `<button class="sub-tab${activeSubTag === tag ? ' active' : ''}" data-sub="${tag}">${tag === 'all' ? '전체' : tag}</button>`
+    ).join('');
+    el.querySelectorAll('.sub-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        el.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        activeSubTag = btn.dataset.sub;
+        applyFilters();
+      });
+    });
+  }
+
+  /* ── 필터 통합 ── */
+  function applyFilters() {
+    const q = search.value.trim().toLowerCase();
+    let filtered = cards.filter(c => c.category === activePrimary);
+    if (activeSubTag !== 'all') {
+      filtered = filtered.filter(c => c.subTags.includes(activeSubTag));
+    }
+    if (q) {
+      filtered = filtered.filter(c =>
+        (c.name + ' ' + c.desc + ' ' + c.repo).toLowerCase().includes(q)
+      );
+    }
+    // 열려 있던 스킬이 현재 필터 결과에서 사라졌으면 상세 패널을 닫는다.
+    if (selectedRepo && !filtered.some(c => c.repo === selectedRepo)) {
+      resetDetail();
+    }
+    render(filtered);
+  }
+
+  /* ── 검색 ── */
+  search.addEventListener('input', applyFilters);
+
+  /* ── 상위 탭 ── */
+  document.querySelectorAll('.tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      activePrimary = btn.dataset.tab;
+      activeSubTag = 'all';
+      renderSubTabs();
+      applyFilters();
+      resetDetail();
+    });
+  });
+
+  window.addEventListener('resize', syncPanelHeight);
+
+  /* ── 실행 ── */
+  loadSkills();
+</script>
+
 </body>
 </html>

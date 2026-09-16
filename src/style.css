@@ -114,7 +114,6 @@ header p#page-subtitle {
   flex: 1;
   min-width: 0;
   padding-bottom: 80px;
-  min-height: 70vh;   /* 카드 수가 달라져도 전체 높이·푸터 위치를 고정 */
 }
 
 /* ── GRID ── */
@@ -124,7 +123,6 @@ header p#page-subtitle {
   gap: 14px;
   margin-top: 24px;
 }
-.grid[hidden] { display: none; }
 
 /* ── CARD ── */
 .card {
@@ -224,72 +222,6 @@ header p#page-subtitle {
 }
 .btn-gh:hover { border-color: #aaa; color: var(--text); }
 
-/* ── AI 사이트 타일 ── */
-.sites-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-  margin-top: 28px;
-}
-.sites-grid[hidden] { display: none; }
-.site-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 10px;
-  padding: 26px 16px 22px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  text-decoration: none;
-  color: var(--text);
-  cursor: pointer;
-  transition: border-color .15s, box-shadow .15s, transform .1s;
-}
-.site-tile:hover {
-  border-color: #d0d0d0;
-  box-shadow: 0 2px 8px rgba(0,0,0,.09), 0 8px 24px rgba(0,0,0,.08);
-  transform: translateY(-2px);
-}
-.site-tile.active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(171,173,176,.25), 0 2px 8px rgba(0,0,0,.08);
-}
-.site-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.site-icon img { width: 32px; height: 32px; display: block; }
-.site-icon-svg { display: flex; align-items: center; justify-content: center; color: var(--accent); }
-.site-icon-svg svg { display: block; }
-.site-icon-fallback {
-  width: 100%; height: 100%;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--muted);
-}
-.site-name {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-}
-.site-desc {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
 /* ── TABS (상위) ── */
 .tabs {
   max-width: 1400px;
@@ -323,8 +255,7 @@ header p#page-subtitle {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  align-items: center;
-  min-height: 27px;   /* 서브탭이 없는 탭에서도 줄 높이를 유지해 세로 흔들림 방지 */
+  min-height: 0;
 }
 .sub-tab {
   padding: 4px 14px;
@@ -418,7 +349,6 @@ footer a { color: var(--muted); }
   flex-direction: column;
 }
 #detail-body[hidden] { display: none; }
-#detail-body-site[hidden] { display: none; }
 #detail-empty[hidden] { display: none; }
 
 @media (max-width: 900px) {
