@@ -8,7 +8,7 @@
 
 AI(ChatGPT · Claude · Gemini 등)가 쓴 한글 글을 **내용은 한 글자도 건드리지 않고** 문체 · 리듬 · 표현만 자연스러운 한국어로 되돌리는 CLI 스킬입니다.
 
-번역투, 과도한 영어 인용, 기계적 병렬 ("첫째 · 둘째 · 셋째"), "결론적으로 / 시사하는 바가 크다" 같은 AI 특유 관용구, 피동태 남용, 문두 접속사 남발, 이모지·불릿 남용 등 **10대 카테고리 × 70 서브 패턴**(+검증 대기 hold 1건)을 심각도(S1/S2/S3)로 분류해 스팬 단위로 탐지한 뒤, 윤문합니다. 
+번역투, 과도한 영어 인용, 기계적 병렬 ("첫째 · 둘째 · 셋째"), "결론적으로 / 시사하는 바가 크다" 같은 AI 특유 관용구, 피동태 남용, 문두 접속사 남발, 이모지·불릿 남용 등 **10대 카테고리 × 85 서브 패턴**(+검증 대기 hold 1건 포함)을 심각도(S1/S2/S3)로 분류해 스팬 단위로 탐지한 뒤, 윤문합니다. 
 
 ## 설치 (Install)
 
@@ -122,7 +122,7 @@ cd im-not-ai
 | I | 형식명사 과다 | "것이다", "점", "수", "바", "~할 필요가 있다" |
 | J | 시각 장식 남용 | 과도한 **볼드**, "따옴표", 대시(—) 남발 |
 
-전체 70 서브 패턴(+hold 1건)과 처방: [`ai-tell-taxonomy.md`](skills/humanize-korean/references/ai-tell-taxonomy.md) · [`rewriting-playbook.md`](skills/humanize-korean/references/rewriting-playbook.md) · 학술 인용 외부 SSOT: [`scholarship.md`](skills/humanize-korean/references/scholarship.md) (v2.0 신규)
+전체 85 서브 패턴(hold 1건 포함)과 처방: [`ai-tell-taxonomy.md`](skills/humanize-korean/references/ai-tell-taxonomy.md) · [`rewriting-playbook.md`](skills/humanize-korean/references/rewriting-playbook.md) · 학술 인용 외부 SSOT: [`scholarship.md`](skills/humanize-korean/references/scholarship.md) (v2.0 신규)
 
 ## 심각도 & 품질 등급
 
@@ -195,7 +195,9 @@ Claude Code에서는 세 가지 방법 중 편한 쪽으로 사용합니다. Git
 /humanize [윤문할 텍스트 또는 파일 경로]
 ```
 
-옵션을 인자 끝에 자연어로 적을 수 있습니다: `장르: 칼럼`, `강도: 적극`, `최소심각도: S1`. 결과가 마음에 안 들면 `/humanize-redo "번역투만 다시"` 같은 식으로 재실행. 두 진입점은 이제 스킬입니다: [`humanize`](skills/humanize/SKILL.md) · [`humanize-redo`](skills/humanize-redo/SKILL.md)
+옵션을 인자 끝에 자연어로 적을 수 있습니다: `장르: 칼럼`, `강도: 적극`, `최소심각도: S1`. 결과가 마음에 안 들면 `/humanize-redo "번역투만 다시"` 같은 식으로 재실행. 진입점은 스킬입니다: [`humanize`](skills/humanize/SKILL.md) · [`humanize-scan`](skills/humanize-scan/SKILL.md) · [`humanize-redo`](skills/humanize-redo/SKILL.md)
+
+전수 윤문을 돌릴 값어치가 있는지 먼저 보고 싶으면 `/humanize-scan`입니다. 워크스페이스·진단·게이트 없이 이 대화 안에서 끝나고, [실측 판별력](skills/humanize-korean/references/empirical-validation.md)이 모델·과업을 바꿔도 살아남은 AI 티 6개(C-8 대구 12배 · E-1 장문 결핍 · C-11 연결어미 쉼표 · I-4 당위 · E-2 종결 편중 · F-5 추상 체인)를 실제로 고쳐 본 전후 수치와 바뀐 문장 표본을 돌려줍니다. 손볼 게 많다고 나오면 전문 대신 `/humanize`를 권합니다 — 6개만 본 결과를 완성본으로 쓰게 두지 않기 위해서입니다.
 
 **방법 C — Plugin / 마켓플레이스 (공식)**
 
@@ -299,6 +301,18 @@ Claude Code 세션 안에서 새 글을 붙여넣고 똑같이 부탁하면 됩�
 - 큰따옴표 내부 직접 인용
 - 법률 · 규정 조문
 - 학술 개념어 (불가피한 경우)
+
+## commit-ko — 커밋 메시지 자연화 (opt-in 부속 스킬)
+
+같은 저장소에 함께 있지만 humanize-korean과는 독립된 별도 스킬입니다. AI가 제안한 한글 커밋 메시지 1~2줄의 사무적·번역투 어휘("~을 수행함"·"~을 진행함")만 걷어냅니다. 진단·청킹 없이 단일 콜로 즉시 처리합니다.
+
+```
+커밋 메시지 자연스럽게: fix(auth): 로그인 실패 시 재시도 로직을 수행함
+```
+
+→ `fix(auth): 로그인 실패 시 재시도 로직 추가` (type/scope 접두사, 이슈 번호, 파일·함수명은 그대로 보존)
+
+기본 플러그인·`install.sh` 범위 밖이라 별도 설치가 필요합니다: `./install.sh --extras` (자세한 내용은 [`INSTALL.md`](INSTALL.md#commit-ko-opt-in-부속-스킬)). 스킬 정의: [`extras/skills/commit-ko/SKILL.md`](extras/skills/commit-ko/SKILL.md)
 
 ## 웹 서비스 확장 (옵션)
 
@@ -412,7 +426,7 @@ Claude Code 세션 안에서 새 글을 붙여넣고 똑같이 부탁하면 됩�
 **핵심 변경**
 
 - **구조 수렴 게이트 (`scripts/verify_gates.py`, LLM 콜 0)** — ① 문자율(폭주 재작성 상한, 기존) ② **진단 목표달성**(진단이 지목한 지표가 실제로 사람 분포로 수렴했는지 z-score로 검증) ③ **대구 전멸 방지**(C-8 "A가 아니라 B"를 다 깨서 필자 목소리를 지우면 실패) ④ golden + **수치 주입 차단**. 문자 change_rate가 못 보던 구조 편집(쉼표·대구 해체)을 결정적으로 검증합니다. 기존 `verify_change_rate.py`는 하위호환 보존.
-- **진단 슬림 인덱스 (`references/diagnosis-rules.md`, 빌드 생성)** — 진단이 taxonomy 전량(74.8KB)을 읽던 것을 71패턴 전수 × 2줄(ID·정의·탐지 시그니처)의 ~13KB 인덱스로 교체(83%↓). 진단 콜 토큰 35~50% 절감, 지배 패턴 지목 품질은 실측 회귀로 동등 확인. SSOT(`ai-tell-taxonomy.md`)는 무수정 유지, `build_diagnosis_rules.py --check`가 drift 차단.
+- **진단 슬림 인덱스 (`references/diagnosis-rules.md`, 빌드 생성)** — 진단이 taxonomy 전량(74.8KB)을 읽던 것을 전 패턴 전수 × 2줄(ID·정의·탐지 시그니처)의 ~13KB 인덱스로 교체(83%↓). 진단 콜 토큰 35~50% 절감, 지배 패턴 지목 품질은 실측 회귀로 동등 확인. SSOT(`ai-tell-taxonomy.md`)는 무수정 유지, `build_diagnosis_rules.py --check`가 drift 차단.
 
 ## v2.2 — route_hint 3경로 · 단일 콜 우선 (2026-07)
 
