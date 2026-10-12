@@ -141,8 +141,8 @@ ingest하며, `--changed-only --skip-zotero --offline --no-email`로 외부 동�
 
 | 단계 | 모델 | 단가 (입력 / 출력) |
 |------|------|------|
-| 리뷰 기본 제공자 · 인사이트 | `claude-sonnet-5` | $2 / $10 (인트로, ~2026-08-31) → $3 / $15 |
-| 연결 선택·관계·이유 생성 | SPECTER2/BM25 후보 + 메타데이터 규칙 | 이 단계의 LLM 호출 없음 |
+| 리뷰 기본 제공자 · 인사이트 | `claude-sonnet-5` | $3 / $15 |
+| 연결 후보·관계·설명 생성 | SPECTER2/BM25 RRF 후보 + `claude-haiku-4-5` judge | 후보당 Haiku 호출; 5개 후보 기준 편당 약 $0.009 |
 | Figure 검증 (vision judge) | `claude-haiku-4-5` | $1 / $5 |
 | 타임라인 내러티브 | `claude-opus-5` (5) | $5 / $25 |
 | 분류 | — (HDBSCAN + UMAP) | **LLM 호출 0회 → $0** |
@@ -150,18 +150,17 @@ ingest하며, `--changed-only --skip-zotero --offline --no-email`로 외부 동�
 
 **편당 리뷰 대략치** — 리뷰 1편은 논문 본문 발췌 + 프롬프트를 입력, 6섹션 한국어 리뷰를 출력합니다. 대략 입력 ~15k · 출력 ~4k 토큰으로 잡으면:
 
-- 인트로 단가($2/$10): `15k × $2/1M + 4k × $10/1M ≈ $0.03 + $0.04 = ~$0.07`
-- 9/1 이후($3/$15): `15k × $3/1M + 4k × $15/1M ≈ $0.045 + $0.06 = ~$0.11`
-- 여기에 연결 생성(증분) + Figure 검증(Haiku)까지 얹으면 **편당 대략 $0.05–0.15** 수준입니다.
+- `15k × $3/1M + 4k × $15/1M ≈ $0.045 + $0.06 = ~$0.11`
+- 여기에 관련 논문 판정(새 쌍만, 편당 약 $0.009) + Figure 검증(Haiku)을 얹으면 **편당 대략 $0.12–0.15** 수준입니다.
 
 **월간 운영 대략치** — 주간 ~20편(월 ~80편) 사이클 기준:
 
-- 리뷰: 80편 × ~$0.10 ≈ **$8**
-- 연결(증분, dirty 논문만) + 카테고리 요약(Haiku) ≈ **$1–3**
+- 리뷰: 80편 × ~$0.11 ≈ **$9**
+- 관련 논문 판정(새 쌍만, 판정된 쌍은 캐시) + 카테고리 요약 ≈ **$1–3**
 - 타임라인(변경된 카테고리만, Opus, 비정기) ≈ **$1–3**
 - **합계 ≈ 월 $10–20** 수준 (Insights opt-in `--insights` 또는 전체 타임라인 재생성 시 증가)
 
-> **각주**: Sonnet 5 인트로 단가는 2026-08-31까지이며 **9/1 인트로 종료 후 재평가 예정**입니다. 분류 단계는 LLM을 전혀 호출하지 않으므로(HDBSCAN) 비용이 없습니다. Deep Research 답변 생성은 독자 BYOK라 운영자 비용에 포함되지 않습니다.
+> **각주**: 관련 논문 판정은 실행당 `RELATION_JUDGE_MAX_USD`(기본 $5) 상한이 있어, 수천 편짜리 토픽을 처음 판정할 때(ai4s 2,709편 전체 ≈ $18)는 상한을 올려야 합니다. 분류 단계는 LLM을 전혀 호출하지 않으므로(HDBSCAN) 비용이 없습니다. Deep Research 답변 생성은 독자 BYOK라 운영자 비용에 포함되지 않습니다.
 
 ## 기능
 
@@ -183,7 +182,7 @@ ingest하며, `--changed-only --skip-zotero --offline --no-email`로 외부 동�
 | 기능 | 설명 |
 |------|------|
 | **자동 분류** | Bottom-up 토픽 모델링(SPECTER2 + HDBSCAN + UMAP)으로 카테고리 자동 생성·배정 — LLM 호출 0회 |
-| **같이 보면 좋은 논문** | `topic_modeling.py`와 `extract_insights.py`는 SPECTER2 dense + 제목·저자 BM25를 RRF로 융합하고 동일한 결정론적 builder로 관계 유형과 한국어 이유를 생성합니다. 연결 단계는 LLM을 호출하지 않으며, 관계는 메타데이터 기반 휴리스틱이지 인용·인과관계의 확정 판정이 아닙니다. |
+| **같이 보면 좋은 논문** | SPECTER2 코사인과 제목·저자 BM25를 RRF(`k=60`)로 융합해 논문당 최대 5개 후보를 고른 뒤, 리뷰 내용을 읽는 Haiku judge가 두 논문의 짧은 이름을 모두 포함해 공통점과 차이를 설명하는 한국어 한 문장을 씁니다. `unrelated`는 제거하고 판단 불가는 “관계 미분석 — 임베딩 유사도로 추천된 후보입니다.”로 표시합니다. 관계는 인용·인과관계의 확정 판정이 아닙니다. |
 | **Deep Research** | 자연어 질의 → hybrid 검색(BM25+dense) → 독자 BYOK 제공자의 답변 + `[N]` 인용 |
 | **타임라인** | 카테고리별 연구 동향 내러티브 + 다이어그램(PaperBanana) + main research timeline |
 | **지식 축적** | Obsidian 연동 — 메모가 다음 질의에 반영되는 compounding knowledge |
@@ -195,7 +194,7 @@ ingest하며, `--changed-only --skip-zotero --offline --no-email`로 외부 동�
 |------|---------|------|
 | **콘텐츠 배포 (O-1)** | `--mode deploy` 또는 기능 `publish` | Cloudflare Workers + gh-pages 스텁 — [운영 매뉴얼](docs/operations.md#deploy-option-o-1). Audio 이메일은 별도 `email` 기능 |
 | **Insights + 네트워크 (O-2)** | `--insights` | 크로스카테고리 인사이트 + UMAP 2D/3D 인터랙티브 네트워크 재생성 |
-| **워크플로 다이어그램** | `generate_usage_diagram.py` · `generate_workflow.py` | 사용 경로 그림(matplotlib, 키 없음) · 상단 고양이 다이어그램(PaperBanana, `--style cat/fairy/academic`) |
+| **워크플로 다이어그램** | `generate_usage_diagram.py` · `generate_workflow.py` | 사용 경로·파이프라인 고양이 그림(PaperBanana, 기본 `--style cat`) · 키 없이 다시 그리려면 사용 경로 그림 `--style plain`(matplotlib) |
 
 **전체 curate 워크플로 요구사항**: Zotero 컬렉션 + PDF와 자격증명
 `ZOTERO_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`(환경변수 또는 OS 키 저장소의
@@ -209,7 +208,7 @@ ingest하며, `--changed-only --skip-zotero --offline --no-email`로 외부 동�
 2. **구조화 리뷰** — Claude가 6섹션 한국어 `review.md`
 3. **피인용·레퍼런스** — `citations.md`(이력 누적) + `references.md`. 기본 30일 증분, 외부 API 장애가 파이프라인을 죽이지 않는 soft step(`--skip-metrics`)
 4. **토픽 모델링 + 분류** — SPECTER2 + HDBSCAN + UMAP로 카테고리 자동 생성·배정
-5. **같이 보면 좋은 논문** — SPECTER2 코사인 + 제목·저자 BM25를 RRF로 융합해 후보를 정렬하고, `lib.related.build_connections`가 순위와 기록된 메타데이터로 연결을 생성합니다. 전체 실행의 `extract_insights.py`도 동일한 builder를 사용합니다.
+5. **같이 보면 좋은 논문** — `topic_modeling.py` Step 6과 `extract_insights.py` connections pass 모두 SPECTER2 코사인 + 제목·저자 BM25 RRF(`k=60`) 후보를 같은 judge(`judge_if_enabled`)에 통과시킵니다. judge는 리뷰의 Essence·Motivation Gap/Approach·첫 Achievement를 Claude Haiku에 보내 관계와 양쪽 페이지에 같은 한국어 한 문장 설명을 만듭니다. `unrelated`는 제거하며, 판단 실패·비활성화·예산 초과 시에는 “관계 미분석 — 임베딩 유사도로 추천된 후보입니다.”를 남깁니다.
 6. **카테고리 요약 + 타임라인 내러티브/main·category 다이어그램** & **Deep Research 검색 인덱스**(BM25 + Gemini 임베딩)
 7. **토픽 인덱스** `index.html`(Deep Research·Audio Overview 내장) → **로컬 열람**(`serve_local.py`) 또는 **배포**
 
