@@ -40,6 +40,13 @@ npx -y @nomadamas/k-skill@0 update
 
 기여 전에는 [기여 가이드](CONTRIBUTING.md)를 확인해 주세요.
 
+## 협력사
+
+<p align="center">
+  <a href="https://www.bccard.com"><img src="docs/assets/bccard-logo.png" alt="BC카드" width="242"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/assets/heyumi-logo.png" alt="Heyumi" height="60">
+</p>
+
 ## 어떤 걸 할 수 있나
 
 총 125개 스킬을 한국 실생활 영역별 카테고리로 나눴습니다. 각 영역은 아래 별도 표에 정리되어 있습니다.
@@ -329,6 +336,3 @@ npx -y @nomadamas/k-skill@0 update
 
 [![k-skill 컨트리뷰터](https://contrib.rocks/image?repo=NomaDamas/k-skill)](https://github.com/NomaDamas/k-skill/graphs/contributors)
 
-## 협력사
-
-<a href="https://www.bccard.com"><img src="docs/assets/bccard-logo.png" alt="BC카드" height="30"></a>
