@@ -42,9 +42,10 @@ npx -y @nomadamas/k-skill@0 update
 
 ## 협력사
 
+<!-- BC카드 공식 심볼 원본: https://cdn.bccard.com/static/images/comm/logo/etc-bc-s-1-l.png (144×144, 3× 표시 해상도) -->
 <p align="center">
-  <a href="https://www.bccard.com"><img src="docs/assets/bccard-logo.png" alt="BC카드" width="242"></a>&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs/assets/heyumi-logo.png" alt="Heyumi" height="60">
+  <a href="https://www.bccard.com"><img src="docs/assets/bccard-logo.png" alt="BC카드" width="48" height="48"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/assets/heyumi-logo.png" alt="Heyumi" width="48" height="48">
 </p>
 
 ## 어떤 걸 할 수 있나
