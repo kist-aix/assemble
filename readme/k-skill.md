@@ -1,3 +1,7 @@
+🌐 [한국어](README.md) | [English](README.en.md) | [中文](README.zh.md) | [日本語](README.ja.md)
+
+> 외국인 관광객 및 한국 거주 외국인은 영어·중국어·일본어 README를 참고하세요.
+
 # k-skill
 
 ![k-skill thumbnail](docs/assets/k-skill-thumbnail.png)
@@ -39,6 +43,13 @@ npx -y @nomadamas/k-skill@0 update
 다만 에이전트는 자동으로 누르지 말고, 사용자가 동의한 경우에만 `gh repo star NomaDamas/k-skill` 를 실행합니다.
 
 기여 전에는 [기여 가이드](CONTRIBUTING.md)를 확인해 주세요.
+
+## 같이 쓰면 좋은 도구
+
+k-skill이 에이전트를 **한국 서비스**에 연결해 준다면, 아래 둘은 **내 컴퓨터**에 연결해 줍니다.
+
+- 🔎 **[AutoRAG Agent](https://github.com/Marker-Inc-Korea/AutoRAG)**: 파일·카톡·Slack·메일·HWP까지 읽고 출처 달린 답을 주는 개인 사서 에이전트. Claude Code·Codex에 MCP로 연결. `npm i -g @autorag/librarian`
+- 🌻 **[Dazzi](https://dazziapp.com/)**: AutoRAG 기반 AI 파일 매니저 (macOS·Windows). `brew install --cask nomadamas/dazzi/dazzi`
 
 ## 협력사
 
@@ -93,7 +104,7 @@ npx -y @nomadamas/k-skill@0 update
 
 | 할 수 있는 일 | 스킬 이름 | 설명 |
 | --- | --- | --- |
-| [한국 법령 검색](docs/features/korean-law-search.md) | `korean-law-search` | 한국 법령/조문/판례/유권해석 검색 |
+| [한국 법령 검색](docs/features/korean-law-search.md) | `korean-law-search` | 한국 법령/조문/판례/유권해석 검색, 개정 조문만 주면 현행을 가져와 만드는 신･구조문대비표(한글 `.hwpx` 저장) |
 | [한국 특허 정보 검색](docs/features/korean-patent-search.md) | `korean-patent-search` | 한국 특허/실용신안 키워드 검색 및 출원번호 상세 조회 |
 | [한국 개인정보처리방침·이용약관 자동 생성](docs/features/korean-privacy-terms.md) | `korean-privacy-terms` | Next.js 프로젝트에 개인정보보호법·약관규제법·전자상거래법 기반 개인정보처리방침/이용약관/쿠키 배너/동의 모달을 생성하는 `kimlawtech/korean-privacy-terms` (Apache-2.0) thin wrapper |
 | [등기부등본 자동화](docs/features/iros-registry-automation.md) | `iros-registry-automation` | 인터넷등기소(IROS)에서 법인/부동산 등기부등본 장바구니, 수동 결제 후 열람·저장 흐름을 보조 |
@@ -163,6 +174,7 @@ npx -y @nomadamas/k-skill@0 update
 | [근처 응급실 병상 상태 확인](docs/features/emergency-room-beds.md) | `emergency-room-beds` | 현재 위치 기준 가까운 응급실 운영·입원실/병상 운영 플래그와 갱신시각 조회 (정확한 잔여 병상 수/가동률은 공개 E-Gen nearby 목록에 없음) |
 | [장기요양·건강검진기관 조회](docs/features/nhis-care-checkup-search.md) | `nhis-care-checkup-search` | 국민건강보험공단 장기요양기관·건강검진기관 공개 후보 조회 (공공데이터포털 15059029·15154419, 프록시 경유) |
 | [의약품 안전 체크](docs/features/mfds-drug-safety.md) | `mfds-drug-safety` | 식약처 e약은요·안전상비의약품 정보를 인터뷰-first 흐름으로 프록시 조회 |
+| [약학정보원 의약품 검색](docs/features/kpic-drug-search.md) | `kpic-drug-search` | 약학정보원(KPIC) 공개 이름 검색과 약품 코드별 상세 원문 조회 (API 키, 로그인, 프록시 불필요) |
 | [식품 안전 체크](docs/features/mfds-food-safety.md) | `mfds-food-safety` | 식약처 부적합 식품·식품안전나라 회수 정보를 인터뷰-first 흐름으로 프록시 조회 |
 | [동물약국·동물용의약품 취급 약국 조회](docs/features/animal-pharmacy-search.md) | `animal-pharmacy-search` | 홍익메디케어 공개 MCP로 지역별 동물약국, 제품 검색, 최근 6개월 구매 이력 기반 취급 약국 조회 |
 
